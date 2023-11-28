@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (c) 2019 PX4 Development Team. All rights reserved.
+ *   Copyright (c) 2019-2023 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -40,11 +40,37 @@
 
 using namespace matrix;
 
-void RateControl::setGains(const Vector3f &P, const Vector3f &I, const Vector3f &D)
+void RateControl::setPidGains(const Vector3f &P, const Vector3f &I, const Vector3f &D)
 {
 	_gain_p = P;
 	_gain_i = I;
 	_gain_d = D;
+}
+
+void RateControl::setLPFGains(const Vector3f &D_fc, const Vector3f &LPF_fc)
+{
+	_D_frq = D_fc;
+	_rate_error_lpf_frq = LPF_fc;
+}
+
+void RateControl::GetCtrlTerm(Vector3f &P_term, Vector3f &I_term, Vector3f &D_term, Vector3f &FF_term)
+{
+	P_term = _rate_prop;
+	I_term = _rate_int;
+	D_term = _rate_diff;
+	FF_term = _rate_ff;
+}
+
+void RateControl::resetFilters(const Vector3f &rate_err, const float dt)
+{
+	float sample_rate_hz = 1.0f/dt;
+	for (int axis = 0; axis < 3; axis++) {
+		// angular velocity low pass
+		_lp_filter_rate_err[axis].set_cutoff_frequency(sample_rate_hz, _rate_error_lpf_frq(axis));
+		_lp_filter_rate_err[axis].reset(rate_err(axis));
+	}
+
+	_reset_filters = false;
 }
 
 void RateControl::setSaturationStatus(const Vector3<bool> &saturation_positive,
@@ -74,13 +100,35 @@ Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, cons
 	// angular rates error
 	Vector3f rate_error = rate_sp - rate;
 
+	const bool dt_changed = (fabsf(dt - _dt_prev) / dt) > 0.1f;
+
+	if (dt_changed) {
+		_reset_filters = true;
+	}
+	_dt_prev  = dt;
+
+	if (_reset_filters) {
+		resetFilters(rate_error, dt);
+		// if resetFilter success, then _reset_filters -> false;
+		if (_reset_filters) {
+			return Vector3f(0.0f, 0.0f, 0.0f);
+		}
+	}
+	//update D term
+	updateDifferential(rate_error, dt);
+	//update P term
+	_rate_prop = _gain_p.emult(rate_error);
+	_rate_ff = _gain_ff.emult(rate_sp);
+
 	// PID control with feed forward
-	const Vector3f torque = _gain_p.emult(rate_error) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp);
+	const Vector3f torque = _rate_ff + _rate_prop + _rate_int + _rate_diff;
 
 	// update integral only if we are not landed
 	if (!landed) {
 		updateIntegral(rate_error, dt);
 	}
+
+	_rate_error_prev = rate_error;
 
 	return torque;
 }
@@ -107,8 +155,8 @@ void RateControl::updateIntegral(Vector3f &rate_error, const float dt)
 		float i_factor = rate_error(i) / math::radians(400.f);
 		i_factor = math::max(0.0f, 1.f - i_factor * i_factor);
 
-		// Perform the integration using a first order method
-		float rate_i = _rate_int(i) + i_factor * _gain_i(i) * rate_error(i) * dt;
+		// Perform the integration using a first order method, use tustin integral: 0.5*dt*(z+1)/(z-1)
+		float rate_i = _rate_int(i) + i_factor * _gain_i(i) * (rate_error(i)+_rate_error_prev(i))*0.5f*dt;
 
 		// do not propagate the result if out of range or invalid
 		if (PX4_ISFINITE(rate_i)) {
@@ -116,6 +164,32 @@ void RateControl::updateIntegral(Vector3f &rate_error, const float dt)
 		}
 	}
 }
+
+void RateControl::updateDifferential(Vector3f &rate_error, const float dt)
+{
+	Vector3f rate_error_lpf, a, b;
+	// lyu: do data filtering
+	if (!_reset_filters) {
+		for (int axis = 0; axis < 3; axis++) {
+			rate_error_lpf(axis) = _lp_filter_rate_err[axis].apply(rate_error(axis));
+			a(axis) = _gain_d(axis)*(M_TWOPI_F*_D_frq(axis))/(dt*M_PI_F*_D_frq(axis) + 1.0f);
+			b(axis) = (dt*M_PI_F*_D_frq(axis) - 1.0f)/(dt*M_PI_F*_D_frq(axis) + 1.0f);
+		}
+	} else {
+		rate_error_lpf = rate_error;
+	}
+
+	// lyu: add the D-term compensator
+	if (!_reset_filters) {
+		_rate_diff = a.emult(rate_error_lpf)-a.emult(_rate_error_lpf_prev)-b.emult(_rate_diff_prev);
+	} else {
+		_rate_diff.zero();
+	}
+
+	_rate_diff_prev = _rate_diff;
+	_rate_error_lpf_prev = rate_error_lpf;
+}
+
 
 void RateControl::getRateControlStatus(rate_ctrl_status_s &rate_ctrl_status)
 {

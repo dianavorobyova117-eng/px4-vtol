@@ -48,3 +48,6 @@
 	path = src/modules/uxrce_dds_client/Micro-XRCE-DDS-Client
 	url = https://github.com/PX4/Micro-XRCE-DDS-Client.git
 	branch = px4
+[submodule "msg"]
+	path = msg
+	url = git@github.com:SYSU-HILAB/VTOL-px4-msgs.git

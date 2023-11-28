@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (c) 2019 PX4 Development Team. All rights reserved.
+ *   Copyright (c) 2019-2023 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -43,6 +43,8 @@
 
 #include <mathlib/mathlib.h>
 #include <uORB/topics/rate_ctrl_status.h>
+#include <adv_control_lib/butterworth_filter.h>
+#include <mathlib/math/filter/LowPassFilter2p.hpp>
 
 class RateControl
 {
@@ -51,12 +53,26 @@ public:
 	~RateControl() = default;
 
 	/**
-	 * Set the rate control gains
+	 * Set the rate control PID gains
 	 * @param P 3D vector of proportional gains for body x,y,z axis
 	 * @param I 3D vector of integral gains
 	 * @param D 3D vector of derivative gains
 	 */
-	void setGains(const matrix::Vector3f &P, const matrix::Vector3f &I, const matrix::Vector3f &D);
+	void setPidGains(const matrix::Vector3f &P, const matrix::Vector3f &I, const matrix::Vector3f &D);
+	/**
+	 * Set the rate control PID gains
+	 * @param D_fc the frequency of HPF (approximate to s)
+	 * @param LPF_fc rate_error lpf cutoff frequency
+	 */
+	void setLPFGains(const matrix::Vector3f &D_fc, const matrix::Vector3f &LPF_fc);
+	/**
+	 * Set the rate control PID gains
+	 * @param P_term
+	 * @param I_term
+	 * @param D_term
+	 * @param FF_term
+	 */
+	void GetCtrlTerm(matrix::Vector3f &P_term, matrix::Vector3f &I_term, matrix::Vector3f &D_term, matrix::Vector3f &FF_term);
 
 	/**
 	 * Set the mximum absolute value of the integrator for all axes
@@ -95,12 +111,25 @@ public:
 	 */
 	matrix::Vector3f update(const matrix::Vector3f &rate, const matrix::Vector3f &rate_sp,
 				const matrix::Vector3f &angular_accel, const float dt, const bool landed);
-
+	// matrix::Vector3f update2nd(const matrix::Vector3f &rate, const matrix::Vector3f &rate_sp,
+	// 			const matrix::Vector3f &angular_accel, const float dt, const bool landed);
 	/**
 	 * Set the integral term to 0 to prevent windup
 	 * @see _rate_int
 	 */
 	void resetIntegral() { _rate_int.zero(); }
+
+	/**
+	 * Set the integral term to 0 for specific axes
+	 * @param  axis roll 0 / pitch 1 / yaw 2
+	 * @see _rate_int
+	 */
+	void resetIntegral(size_t axis)
+	{
+		if (axis < 3) {
+			_rate_int(axis) = 0.f;
+		}
+	}
 
 	/**
 	 * Get status message of controller for logging/debugging
@@ -110,6 +139,9 @@ public:
 
 private:
 	void updateIntegral(matrix::Vector3f &rate_error, const float dt);
+	void updateDifferential(matrix::Vector3f &rate_error, const float dt);
+
+	void resetFilters(const matrix::Vector3f &rate_err, const float dt);
 
 	// Gains
 	matrix::Vector3f _gain_p; ///< rate control proportional gain for all axes x, y, z
@@ -118,8 +150,23 @@ private:
 	matrix::Vector3f _lim_int; ///< integrator term maximum absolute value
 	matrix::Vector3f _gain_ff; ///< direct rate to torque feed forward gain only useful for helicopters
 
+	matrix::Vector3f _D_frq; 	///< D term first order lpf
+	matrix::Vector3f _rate_error_lpf_frq; 	///< rate error lowpass filter fc
+
+	// lowpass filter
+	math::LowPassFilter2p<float> _lp_filter_rate_err[3]{};
+	bool _reset_filters{true};
+
+	float	_dt_prev;
+
 	// States
 	matrix::Vector3f _rate_int; ///< integral term of the rate controller
+	matrix::Vector3f _rate_ff; ///< feedfoward term of the rate controller
+	matrix::Vector3f _rate_prop;  ///< proportional term of the rate controller
+	matrix::Vector3f _rate_diff;  ///< differential term of the rate controller
+	matrix::Vector3f _rate_diff_prev; ///< differential term of the rate controller
+	matrix::Vector3f _rate_error_prev{0.0f, 0.0f, 0.0f}; ///< previous rate error
+	matrix::Vector3f _rate_error_lpf_prev{0.0f, 0.0f, 0.0f}; ///< previous rate error lowpass filtered for D term
 
 	// Feedback from control allocation
 	matrix::Vector<bool, 3> _control_allocator_saturation_negative;
