@@ -112,27 +112,29 @@ include(px4_parse_function_args)
 #
 include(px4_git)
 
-execute_process(
-	COMMAND git describe --exclude ext/* --always --tags
-	OUTPUT_VARIABLE PX4_GIT_TAG
-	OUTPUT_STRIP_TRAILING_WHITESPACE
-	WORKING_DIRECTORY ${PX4_SOURCE_DIR}
-	)
+# execute_process(
+# 	COMMAND git describe --exclude ext/* --always --tags
+# 	OUTPUT_VARIABLE PX4_GIT_TAG
+# 	OUTPUT_STRIP_TRAILING_WHITESPACE
+# 	WORKING_DIRECTORY ${PX4_SOURCE_DIR}
+# 	)
 
-# git describe to X.Y.Z version
-string(REPLACE "." ";" VERSION_LIST ${PX4_GIT_TAG})
+# # git describe to X.Y.Z version
+# string(REPLACE "." ";" VERSION_LIST ${PX4_GIT_TAG})
 
-# major version
-list(GET VERSION_LIST 0 PX4_VERSION_MAJOR)
-string(REPLACE "v" "" PX4_VERSION_MAJOR ${PX4_VERSION_MAJOR})
-# minor version
-list(GET VERSION_LIST 1 PX4_VERSION_MINOR)
-# patch version
-list(GET VERSION_LIST 2 PX4_VERSION_PATCH)
-string(REPLACE "-" ";" PX4_VERSION_PATCH ${PX4_VERSION_PATCH})
-list(GET PX4_VERSION_PATCH 0 PX4_VERSION_PATCH)
+# # major version
+# list(GET VERSION_LIST 0 PX4_VERSION_MAJOR)
+# string(REPLACE "v" "" PX4_VERSION_MAJOR ${PX4_VERSION_MAJOR})
+# # minor version
+# list(GET VERSION_LIST 1 PX4_VERSION_MINOR)
+# # patch version
+# list(GET VERSION_LIST 2 PX4_VERSION_PATCH)
+# string(REPLACE "-" ";" PX4_VERSION_PATCH ${PX4_VERSION_PATCH})
+# list(GET PX4_VERSION_PATCH 0 PX4_VERSION_PATCH)
 
-message(STATUS "PX4 version: ${PX4_GIT_TAG} (${PX4_VERSION_MAJOR}.${PX4_VERSION_MINOR}.${PX4_VERSION_PATCH})")
+# message(STATUS "PX4 version: ${PX4_GIT_TAG} (${PX4_VERSION_MAJOR}.${PX4_VERSION_MINOR}.${PX4_VERSION_PATCH})")
+
+# set(${PX4_GIT_TAG} v1.14.0)
 
 define_property(GLOBAL PROPERTY PX4_MODULE_LIBRARIES
                  BRIEF_DOCS "PX4 module libs"
