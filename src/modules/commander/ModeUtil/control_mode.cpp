@@ -33,7 +33,6 @@
 
 #include "control_mode.hpp"
 #include <uORB/topics/vehicle_status.h>
-#include <iostream>
 namespace mode_util
 {
 
@@ -144,7 +143,6 @@ void getVehicleControlMode(bool armed, uint8_t nav_state, uint8_t vehicle_type,
 		} else if (offboard_control_mode.body_rate) {
 			// #if !defined(CONFIG_MODULES_THRUST_ACC_CONTROL)
 				vehicle_control_mode.flag_control_thrust_acc_enabled  = true;
-				std::cout << "entring";
 			// #endif
 			vehicle_control_mode.flag_control_rates_enabled = true;
 		}
