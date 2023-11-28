@@ -311,16 +311,12 @@ void LoggedTopics::add_high_rate_topics()
 	add_topic("vehicle_torque_setpoint");
 }
 
-void LoggedTopics::add_debug_topics()
+void LoggedTopics::add_control_anaysis_topics()
 {
 	add_topic("debug_array");
-	add_topic("debug_key_value");
-	add_topic("debug_value");
-	add_topic("debug_vect");
-	add_topic_multi("satellite_info", 1000, 2);
-	add_topic("mag_worker_data");
-	add_topic("sensor_preflight_mag", 500);
-	add_topic("actuator_test", 500);
+	add_topic("chirp_sweep");
+	add_topic("mc_rate_ctrl_debug");
+	add_topic("sensor_filter_analysis");
 }
 
 void LoggedTopics::add_estimator_replay_topics()
@@ -577,8 +573,8 @@ void LoggedTopics::initialize_configured_topics(SDLogProfileMask profile)
 		add_high_rate_topics();
 	}
 
-	if (profile & SDLogProfileMask::DEBUG_TOPICS) {
-		add_debug_topics();
+	if (profile & SDLogProfileMask::CONTROL_ANALYSIS) {
+		add_control_anaysis_topics();
 	}
 
 	if (profile & SDLogProfileMask::SENSOR_COMPARISON) {

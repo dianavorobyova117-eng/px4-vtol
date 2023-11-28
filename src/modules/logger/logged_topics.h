@@ -49,7 +49,7 @@ enum class SDLogProfileMask : int32_t {
 	THERMAL_CALIBRATION =   1 << 2,
 	SYSTEM_IDENTIFICATION = 1 << 3,
 	HIGH_RATE =             1 << 4,
-	DEBUG_TOPICS =          1 << 5,
+	CONTROL_ANALYSIS =      1 << 5,
 	SENSOR_COMPARISON =     1 << 6,
 	VISION_AND_AVOIDANCE =  1 << 7,
 	RAW_IMU_GYRO_FIFO =     1 << 8,
@@ -169,7 +169,7 @@ private:
 	void add_thermal_calibration_topics();
 	void add_system_identification_topics();
 	void add_high_rate_topics();
-	void add_debug_topics();
+	void add_control_anaysis_topics();
 	void add_sensor_comparison_topics();
 	void add_vision_and_avoidance_topics();
 	void add_raw_imu_gyro_fifo();

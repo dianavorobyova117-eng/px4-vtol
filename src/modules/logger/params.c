@@ -121,7 +121,7 @@ PARAM_DEFINE_INT32(SDLOG_MISSION, 0);
  * 2 : Topics for thermal calibration (high rate raw IMU and Baro sensor data)
  * 3 : Topics for system identification (high rate actuator control and IMU data)
  * 4 : Full rates for analysis of fast maneuvers (RC, attitude, rates and actuators)
- * 5 : Debugging topics (debug_*.msg topics, for custom code)
+ * 5 : Logging of sweep frequencies topics to analyze
  * 6 : Topics for sensor comparison (low rate raw IMU, Baro and magnetometer data)
  * 7 : Topics for computer vision and collision avoidance
  * 8 : Raw FIFO high-rate IMU (Gyro)
@@ -135,7 +135,7 @@ PARAM_DEFINE_INT32(SDLOG_MISSION, 0);
  * @bit 2 Thermal calibration
  * @bit 3 System identification
  * @bit 4 High rate
- * @bit 5 Debug
+ * @bit 5 Control Analysis
  * @bit 6 Sensor comparison
  * @bit 7 Computer Vision and Avoidance
  * @bit 8 Raw FIFO high-rate IMU (Gyro)
