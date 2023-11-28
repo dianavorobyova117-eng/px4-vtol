@@ -51,3 +51,4 @@
 [submodule "msg"]
 	path = msg
 	url = git@github.com:SYSU-HILAB/VTOL-px4-msgs.git
+	branch = main
