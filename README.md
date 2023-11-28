@@ -1,4 +1,4 @@
-#WARNING
+# WARNING
 You should first configure your ssh keys for git and github!
 It might be helpful to add proxy to git even if you have system proxy.
 
