@@ -36,3 +36,23 @@ git submodule update --init --recursive
 make px4_fmu-v6c
 make px4_sitl gz_x500
 ```
+
+
+# TAILSITTER
+## Aerodynamics Plugin
+```shell
+git clone git@github.com:SYSU-HILAB/VTOL-gz-simulation.git
+cd VTOL-gz-simulation.git
+```
+Then build and install your plugin
+```shell
+cmake -Bbuild -S.
+cmake --build build
+cmake --install build
+```
+
+
+## PX4-RUN
+```shell
+make px4_sitl gz_tailsitter
+```
