@@ -248,7 +248,7 @@
 
       <sensor
         name="imu_sensor" type="imu">
-        <pose>0 0 0 0 1.5709 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <!-- <pose>0 0 0 0 0 0</pose> -->
         <relative_to></relative_to>
         <always_on>1</always_on>
