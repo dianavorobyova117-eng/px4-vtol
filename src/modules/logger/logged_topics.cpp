@@ -45,6 +45,11 @@ using namespace px4::logger;
 
 void LoggedTopics::add_default_topics()
 {
+	//add two lines to record mocap data in log
+	//add_topic("vehicle_mocap_odometry", 30);
+	add_topic("vehicle_visual_odometry", 30);
+
+
 	add_topic("action_request");
 	add_topic("actuator_armed");
 	add_optional_topic("actuator_controls_status_0", 300);
