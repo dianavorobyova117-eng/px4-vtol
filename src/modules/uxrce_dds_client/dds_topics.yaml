@@ -83,6 +83,8 @@ subscriptions:
   - topic: /fmu/in/vehicle_thrust_acc_setpoint
     type: px4_msgs::msg::VehicleThrustAccSetpoint
 
+  - topic: /fmu/in/vehicle_visual_odometry
+    type: px4_msgs::msg::VehicleOdometry
   # - topic: /fmu/in/actuator_motors
   #   type: px4_msgs::msg::ActuatorMotors
 
