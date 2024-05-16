@@ -129,12 +129,15 @@ ThrustAccControl::Run()
 
 		_vehicle_control_mode_sub.update(&_vehicle_control_mode);
 		// // must enable thrust_acc_control to allow it control VehicleThrust
+		PX4_INFO("Entering thrust_acc_control mode");
 		if (_vehicle_control_mode.flag_control_thrust_acc_enabled == true) {
 		_vehicle_thrust_acc_setpoint_sub.update();
+
 		_last_run = _vehicle_thrust_acc_setpoint_sub.get().timestamp;
 		_thrust_acc_sp = _vehicle_thrust_acc_setpoint_sub.get().thrust_acc_sp;
 		_rates_setpoint = matrix::Vector3f(_vehicle_thrust_acc_setpoint_sub.get().rates_sp);
-
+		// print vehicle_thrust_acc
+		PX4_INFO("Thrust_acc: %f", (double)_thrust_acc_sp);
 		if (_last_run && hrt_absolute_time()  -  _last_run > _timeout_time)
 		{
 			PX4_WARN("Haven't Received Thrust Acc Setpoint Messages! Restored to Hold mode");
