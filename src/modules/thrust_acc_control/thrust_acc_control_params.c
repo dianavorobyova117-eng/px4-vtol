@@ -43,13 +43,13 @@
  *
  * [at_sp - hat(at)] * K * (P+I*1/s+D*s) + thrust_ff = Thrust_setpoint
  *
- * @min 0.01
+ * @min 0.00
  * @max 100.0
  * @decimal 3
  * @increment 0.01
  * @group Multicopter Rate Control
  */
-PARAM_DEFINE_FLOAT(THR_P, 0.0588f);
+PARAM_DEFINE_FLOAT(THR_P, 0.0188f);
 
 
 /**
