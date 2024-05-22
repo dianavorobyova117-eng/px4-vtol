@@ -141,9 +141,9 @@ void getVehicleControlMode(bool armed, uint8_t nav_state, uint8_t vehicle_type,
 			vehicle_control_mode.flag_control_attitude_enabled = true;
 
 		} else if (offboard_control_mode.body_rate) {
-			// #if !defined(CONFIG_MODULES_THRUST_ACC_CONTROL)
-			vehicle_control_mode.flag_control_thrust_acc_enabled  = true;
-			// #endif
+			// // #if !defined(CONFIG_MODULES_THRUST_ACC_CONTROL)
+			// vehicle_control_mode.flag_control_thrust_acc_enabled  = true;
+			// // #endif
 			vehicle_control_mode.flag_control_rates_enabled = true;
 		}
 

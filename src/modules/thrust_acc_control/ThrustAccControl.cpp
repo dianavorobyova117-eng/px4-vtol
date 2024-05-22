@@ -115,7 +115,8 @@ void ThrustAccControl::Run() {
   if (_vehicle_angular_velocity_sub.updated()) {
     _vehicle_control_mode_sub.update(&_vehicle_control_mode);
     // // must enable thrust_acc_control to allow it control VehicleThrust
-    if (_vehicle_control_mode.flag_control_thrust_acc_enabled == true) {
+    _vehicle_control_mode.flag_control_thrust_acc_enabled
+    if (_vehicle_control_mode.flag_control_offboard_enabled &&_vehicle_control_mode.flag_control_rates_enabled) {
       _vehicle_thrust_acc_setpoint_sub.update();
 
       _last_run = _vehicle_thrust_acc_setpoint_sub.get().timestamp;
@@ -124,9 +125,9 @@ void ThrustAccControl::Run() {
           matrix::Vector3f(_vehicle_thrust_acc_setpoint_sub.get().rates_sp);
       // print vehicle_thrust_acc
       if (_last_run && hrt_absolute_time() - _last_run > _timeout_time) {
-        PX4_WARN(
-            "Haven't Received Thrust Acc Setpoint Messages! Restored to Hold "
-            "mode");
+        // PX4_WARN(
+        //     "Haven't Received Thrust Acc Setpoint Messages! Restored to Hold "
+        //     "mode");
         _thrust_acc_sp = _timeout_acc;
         // TODO change it to hold rates
         _rates_setpoint(0) = 0.0;
