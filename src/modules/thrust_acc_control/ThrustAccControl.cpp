@@ -115,7 +115,6 @@ void ThrustAccControl::Run() {
   if (_vehicle_angular_velocity_sub.updated()) {
     _vehicle_control_mode_sub.update(&_vehicle_control_mode);
     // // must enable thrust_acc_control to allow it control VehicleThrust
-    _vehicle_control_mode.flag_control_thrust_acc_enabled
     if (_vehicle_control_mode.flag_control_offboard_enabled &&_vehicle_control_mode.flag_control_rates_enabled) {
       _vehicle_thrust_acc_setpoint_sub.update();
 
