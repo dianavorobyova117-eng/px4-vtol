@@ -56,6 +56,7 @@
 #include <uORB/topics/vehicle_control_mode.h>
 #include <uORB/topics/vehicle_rates_setpoint.h>
 #include <uORB/topics/vehicle_status.h>
+#include <uORB/topics/vehicle_thrust_setpoint.h>
 // #include <uORB/topics/vehicle_
 // #include <uORB/topics/vehithrus
 #include <uORB/topics/vehicle_thrust_acc_setpoint.h>
@@ -102,7 +103,8 @@ private:
 
   uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update),
                                                    1_s};
-
+  uORB::SubscriptionData<vehicle_thrust_setpoint_s> _vehicle_thrust_setpoint_sub{
+      ORB_ID(vehicle_thrust_setpoint)};
   uORB::SubscriptionCallbackWorkItem _vehicle_angular_velocity_sub{
       this, ORB_ID(vehicle_angular_velocity)};
 

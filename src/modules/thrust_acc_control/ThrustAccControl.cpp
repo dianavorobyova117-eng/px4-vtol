@@ -67,7 +67,7 @@ void ThrustAccControl::resetButterworthFilter() {
   _thrust_sp_lpf.set_cutoff_frequency(_param_imu_gyro_cutoff.get(),
                                       _param_thr_lpf_cutoff_frq.get());
   
-  _thrust_sp_lpf.reset(0.00f);
+  _thrust_sp_lpf.reset(_u_prev);
 }
 
 void ThrustAccControl::parameters_updated() {
@@ -116,6 +116,7 @@ void ThrustAccControl::Run() {
   /* run controller on gyro changes */
   // vehicle_angular_velocity_s linear_acc_b;
   // Accordiing sensor gyro
+  _vehicle_thrust_setpoint_sub.update();
   if (_vehicle_angular_velocity_sub.updated()) {
     _vehicle_control_mode_sub.update(&_vehicle_control_mode);
     // // must enable thrust_acc_control to allow it control VehicleThrust
@@ -133,7 +134,7 @@ void ThrustAccControl::Run() {
       _u = (_thrust_acc_sp - _a_curr) * _thr_p + _u_prev;
       _u = _thrust_sp_lpf.apply(_u);
       _u = math::constrain<float>(_u, 0.0, 1.0);
-      _u_prev = _u;
+      _u_prev = - _vehicle_thrust_setpoint_sub.get().xyz[2]; 
       vehicle_rates_setpoint_s vehicle_rates_setpoint{};
       vehicle_rates_setpoint.thrust_body[2] = -_u;
       vehicle_rates_setpoint.roll = _rates_setpoint(0);
@@ -143,8 +144,8 @@ void ThrustAccControl::Run() {
       _vehicle_rates_setpoint_pub.publish(vehicle_rates_setpoint);
     }
     else {
+      _u_prev = - _vehicle_thrust_setpoint_sub.get().xyz[2]; 
       resetButterworthFilter();
-      _u_prev = 0.0f;
     }
     // use rates setpoint topic
 
