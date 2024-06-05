@@ -112,13 +112,13 @@ PARAM_DEFINE_FLOAT(THR_BETA, 0.005f);
  *
  * thrust contrl timeout acc when mpc is lost
  *
- * @min 9.8
- * @max 12.0
+ * @min 9.0
+ * @max 9.7
  * @decimal 3
  * @increment 0.01
  * @group Multicopter Rate Control
  */
-PARAM_DEFINE_FLOAT(THR_TMO_ACC, 10.0f);
+PARAM_DEFINE_FLOAT(THR_TMO_ACC, 9.5f);
 
 
 
@@ -132,3 +132,16 @@ PARAM_DEFINE_FLOAT(THR_TMO_ACC, 10.0f);
  * @group Multicopter Rate Control
  */
 PARAM_DEFINE_INT32(THR_TMO_TIME, 2);
+
+
+
+/**
+ * thrust contrl simulation mode
+ *
+ * thrust contrl simulation mode, 1 is enable, 0 is disable.
+ *
+ * @boolean
+ * @group Multicopter Rate Control
+ */
+PARAM_DEFINE_INT32(THR_SIM, 1);
+

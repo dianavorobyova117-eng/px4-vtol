@@ -135,12 +135,14 @@ class ThrustAccControl : public ModuleBase<ThrustAccControl>,
   matrix::Quaternionf _rotate_q{};
   float _thr_p;
 
+  float _thr_model_ff;
   // we assumes the model of thrust is quadratic, i.e. a_t = a*u
   float _delta_thr_bound;
 
-  float _timeout_acc = 9.6;
+  float _timeout_acc = 9.5;
   uint64_t _timeout_time = 0;
   //   ButterworthFilter2nd _thrust_splpf;
+  bool _is_sim = false;
 
   DEFINE_PARAMETERS(
       (ParamFloat<px4::params::THR_P>)_param_thr_p,
@@ -148,5 +150,6 @@ class ThrustAccControl : public ModuleBase<ThrustAccControl>,
       (ParamFloat<px4::params::GYROX_CUTOFF>)_param_imu_gyro_cutoff,
       (ParamFloat<px4::params::THR_DELTA_BOUND>)_param_delta_thr_bound,
       (ParamFloat<px4::params::THR_LPF_CUTOFF>)_param_thr_lpf_cutoff_frq,
+      (ParamBool<px4::params::THR_SIM>)_param_thr_sim,
       (ParamInt<px4::params::THR_TMO_TIME>)_param_sys_timeout_time)
 };
