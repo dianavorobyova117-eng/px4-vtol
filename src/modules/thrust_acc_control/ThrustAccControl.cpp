@@ -130,8 +130,9 @@ void ThrustAccControl::Run() {
     // // must enable thrust_acc_control to allow it control VehicleThrust
     _vehicle_thrust_acc_setpoint_sub.update();
     _vacc_sub.update();
-    if (_vehicle_control_mode.flag_control_offboard_enabled &&
-        _vehicle_control_mode.flag_control_rates_enabled) {
+    _can_run_offboard = (_vehicle_control_mode.flag_control_offboard_enabled &&
+        _vehicle_control_mode.flag_control_rates_enabled);
+    if (_last_can_run && _can_run_offboard) {
       _last_run = _vehicle_thrust_acc_setpoint_sub.get().timestamp;
       _thrust_acc_sp = _vehicle_thrust_acc_setpoint_sub.get().thrust_acc_sp;
       _rates_setpoint =
@@ -172,7 +173,6 @@ void ThrustAccControl::Run() {
       // }
       // last_thrust_sp = _thrust_acc_sp;
 
-      // _u = _thrust_sp_lpf.apply(_u);
       _u = (1 - _beta) * _u + _beta * _thr_model_ff;
       _u = math::constrain<float>(_u, 0.0, 1.0);
       vehicle_rates_setpoint_s vehicle_rates_setpoint{};
@@ -185,15 +185,8 @@ void ThrustAccControl::Run() {
     } else {
       _u_prev = -_vehicle_thrust_setpoint_sub.get().xyz[2];
       _u = _u_prev;
-      vehicle_rates_setpoint_s vehicle_rates_setpoint{};
-      vehicle_rates_setpoint.thrust_body[2] = -_u;
-      vehicle_rates_setpoint.roll = 0;
-      vehicle_rates_setpoint.pitch = 0;
-      vehicle_rates_setpoint.yaw = 0;
-      vehicle_rates_setpoint.timestamp = hrt_absolute_time();
-      _vehicle_rates_setpoint_pub.publish(vehicle_rates_setpoint);
-      resetButterworthFilter();
     }
+    _last_can_run = _can_run_offboard;
 
     // use rates setpoint topic
 

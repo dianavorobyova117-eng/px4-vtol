@@ -147,7 +147,8 @@ class ThrustAccControl : public ModuleBase<ThrustAccControl>,
   uint64_t _timeout_time = 2;
   //   ButterworthFilter2nd _thrust_splpf;
   bool _is_sim = false;
-
+  bool _can_run_offboard = false;
+  bool _last_can_run = false;
   AttitudeControl _attitude_control;
 
   DEFINE_PARAMETERS(

@@ -348,8 +348,8 @@ void LoggedTopics::add_high_rate_topics() {
   // maximum rate to analyze fast maneuvers (e.g. for racing)
 //add_topic("manual_control_setpoint");
   add_topic("rate_ctrl_status", 20);
-  add_topic("vehicle_angular_velocity");
-  add_topic("vehicle_acceleration");
+  add_topic("vehicle_angular_velocity", 10);
+  add_topic("vehicle_acceleration", 10);
   add_topic("vehicle_rates_setpoint");
   add_optional_topic("vehicle_thrust_acc_setpoint");
   add_optional_topic("vehicle_odometry");
