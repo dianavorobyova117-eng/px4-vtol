@@ -47,6 +47,7 @@
 #include <uORB/topics/vehicle_angular_velocity.h>
 #include <uORB/topics/vehicle_attitude.h>
 #include <uORB/topics/vehicle_control_mode.h>
+#include <uORB/topics/vehicle_odometry.h>
 #include <uORB/topics/vehicle_rates_setpoint.h>
 #include <uORB/topics/vehicle_status.h>
 #include <uORB/topics/vehicle_thrust_setpoint.h>
@@ -88,38 +89,39 @@ class ThrustAccControl : public ModuleBase<ThrustAccControl>,
  private:
   void Run() override;
   void resetButterworthFilter();
+  bool safeCheck();
+  void safeAttitudeHolder();
   /**
    * initialize some vectors/matrices from parameters
    */
   void parameters_updated();
 
   float get_u_inverse_model(float target_at);
+  uORB::SubscriptionCallbackWorkItem _vehicle_angular_velocity_sub{
+      this, ORB_ID(vehicle_angular_velocity)};
+  vehicle_angular_velocity_s _ang_vel;
 
   uORB::SubscriptionData<vehicle_thrust_acc_setpoint_s>
       _vehicle_thrust_acc_setpoint_sub{ORB_ID(vehicle_thrust_acc_setpoint)};
   uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
   uORB::Subscription _vehicle_control_mode_sub{ORB_ID(vehicle_control_mode)};
+
   uORB::SubscriptionData<vehicle_attitude_s> _vehicle_attitude_sub{
       ORB_ID(vehicle_attitude)};
-  //   uORB::SubscriptionData<
   uORB::SubscriptionData<sensor_gyro_s> _acc_b_sub{ORB_ID(sensor_gyro)};
   uORB::SubscriptionData<vehicle_acceleration_s> _vacc_sub{
       ORB_ID(vehicle_acceleration)};
-
+  uORB::SubscriptionData<vehicle_odometry_s> _vehicle_odometry_sub{
+      ORB_ID(vehicle_odometry)};
   uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update),
                                                    1_s};
   uORB::SubscriptionData<vehicle_thrust_setpoint_s>
       _vehicle_thrust_setpoint_sub{ORB_ID(vehicle_thrust_setpoint)};
-  uORB::SubscriptionCallbackWorkItem _vehicle_angular_velocity_sub{
-      this, ORB_ID(vehicle_angular_velocity)};
 
   uORB::Publication<vehicle_rates_setpoint_s> _vehicle_rates_setpoint_pub{
       ORB_ID(vehicle_rates_setpoint)};
-
   orb_advert_t _mavlink_log_pub{nullptr};  ///< mavlink log pub
-
-  RateControl _rate_control;
-
+                                           //   RateControl _rate_control;
   vehicle_control_mode_s _vehicle_control_mode{};
 
   float thrust_sp;
@@ -149,6 +151,10 @@ class ThrustAccControl : public ModuleBase<ThrustAccControl>,
   bool _is_sim = false;
   bool _can_run_offboard = false;
   bool _last_can_run = false;
+
+  float _acc_limit;
+  float _rate_limit;
+
   AttitudeControl _attitude_control;
 
   DEFINE_PARAMETERS(
@@ -166,6 +172,8 @@ class ThrustAccControl : public ModuleBase<ThrustAccControl>,
       (ParamFloat<px4::params::THR_DELTA_BOUND>)_param_delta_thr_bound,
       (ParamFloat<px4::params::THR_LPF_CUTOFF>)_param_thr_lpf_cutoff_frq,
       (ParamFloat<px4::params::THR_BETA>)_param_beta,
+      (ParamFloat<px4::params::THR_SFT_ACC>)_param_thr_sft_acc,
+      (ParamFloat<px4::params::THR_SFT_RATE>)_param_thr_sft_rate,
       (ParamBool<px4::params::THR_SIM>)_param_thr_sim,
       (ParamInt<px4::params::THR_TMO_TIME>)_param_sys_timeout_time)
 };

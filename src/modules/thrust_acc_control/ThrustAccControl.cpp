@@ -82,6 +82,9 @@ void ThrustAccControl::parameters_updated() {
   _is_sim = _param_thr_sim.get();
   _beta = _param_beta.get();
 
+  _acc_limit = _param_thr_sft_acc.get();
+  _rate_limit = _param_thr_sft_rate.get();
+
   _attitude_control.setProportionalGain(
       Vector3f(_param_mc_roll_p.get(), _param_mc_pitch_p.get(),
                _param_mc_yaw_p.get()),
@@ -138,20 +141,21 @@ void ThrustAccControl::Run() {
       _rates_setpoint =
           matrix::Vector3f(_vehicle_thrust_acc_setpoint_sub.get().rates_sp);
       _thr_model_ff = _vehicle_thrust_acc_setpoint_sub.get().model_ff;
-
+      if (!safeCheck()) {
+        static uint64_t printer_counter_saft = 0;
+        if (printer_counter_saft % 10 == 0) {
+          printer_counter_saft++;
+          PX4_WARN("Safety Check Failed");
+        }
+        safeAttitudeHolder();
+      }
       if (hrt_elapsed_time(&_last_run) > _timeout_time) {
         static uint64_t print_counter = 0;
-        if (print_counter % 400 == 0) {
+        if (print_counter % 10 == 0) {
           print_counter++;
           PX4_WARN("MPC Timeout");
         }
-        _thrust_acc_sp = _timeout_acc;
-        // identity setpoint
-        matrix::Quatf q_cur(_vehicle_attitude_sub.get().q);
-        const float yaw = Eulerf(q_cur).psi();
-        matrix::Quatf q_sp = Eulerf(0.0, 0.0, yaw);
-        _attitude_control.setAttitudeSetpoint(q_sp, 0.0);
-        _rates_setpoint = _attitude_control.update(q_cur);
+        safeAttitudeHolder();
       }
 
       _u_prev = -_vehicle_thrust_setpoint_sub.get().xyz[2];
@@ -195,6 +199,39 @@ void ThrustAccControl::Run() {
   }
 
   perf_end(_loop_perf);
+}
+
+void ThrustAccControl::safeAttitudeHolder() {
+  _thrust_acc_sp = _timeout_acc;
+  // identity setpoint
+  matrix::Quatf q_cur(_vehicle_attitude_sub.get().q);
+  const float yaw = Eulerf(q_cur).psi();
+  matrix::Quatf q_sp = Eulerf(0.0, 0.0, yaw);
+  _attitude_control.setAttitudeSetpoint(q_sp, 0.0);
+  _rates_setpoint = _attitude_control.update(q_cur);
+}
+
+bool ThrustAccControl::safeCheck() {
+  // position check
+  // TODO map limit
+
+  // TODO trajectory error too large
+
+  // TODO rates too high
+  vehicle_angular_velocity_s _vehicle_angular_velocity;
+  _vehicle_angular_velocity_sub.copy(&_vehicle_angular_velocity);
+  matrix::Vector3f rates{_vehicle_angular_velocity.xyz};
+
+  if (rates.norm() > _rate_limit) {
+    return false;
+  }
+  // TODO accleration is too high
+  matrix::Vector3f acc{_vacc_sub.get().xyz[0], _vacc_sub.get().xyz[1],
+                       _vacc_sub.get().xyz[2] + 9.81f};
+  if (acc.norm() > _acc_limit) {
+    return false;
+  }
+  return true;
 }
 
 int ThrustAccControl::task_spawn(int argc, char *argv[]) {
