@@ -144,24 +144,17 @@ void ThrustAccControl::Run() {
           matrix::Vector3f(_vehicle_thrust_acc_setpoint_sub.get().rates_sp);
       _thr_model_ff = _vehicle_thrust_acc_setpoint_sub.get().model_ff;
       if (!safeCheck()) {
-        static uint64_t printer_counter_saft = 0;
-        if (printer_counter_saft % 10 == 0) {
-          printer_counter_saft++;
-          _safety_check = false;
-          PX4_WARN("Safety Check Failed");
-          PX4_WARN("Auto hold in offboard mode");
-        }
+        _safety_check = false;
+        PX4_WARN("Safety Check Failed");
+        PX4_WARN("Auto hold in offboard mode");
         safeAttitudeHolder();
       }
-      if (hrt_elapsed_time(&_last_run) > _timeout_time) {
-        static uint64_t print_counter = 0;
-        if (print_counter % 10 == 0) {
-          print_counter++;
-          PX4_WARN("MPC Timeout");
-        }
+      if ((_safety_check) && (_last_run > 0) &&
+          hrt_elapsed_time(&_last_run) > _timeout_time) {
+        PX4_WARN("MPC Timeout");
+        _safety_check = false;
         safeAttitudeHolder();
       }
-
       _u_prev = -_vehicle_thrust_setpoint_sub.get().xyz[2];
       // change to FLU setting
       _a_curr = -_vacc_sub.get().xyz[2];
@@ -193,6 +186,7 @@ void ThrustAccControl::Run() {
     } else {
       _u_prev = -_vehicle_thrust_setpoint_sub.get().xyz[2];
       _u = _u_prev;
+      _safety_check = true;
     }
     _last_can_run = _can_run_offboard;
 

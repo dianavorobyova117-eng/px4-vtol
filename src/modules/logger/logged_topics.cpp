@@ -354,6 +354,7 @@ void LoggedTopics::add_high_rate_topics() {
   add_topic("vehicle_thrust_acc_setpoint");
   add_topic("tracking_info");
   add_optional_topic("vehicle_odometry");
+  add_topic("vehicle_visual_odometry", 30);
   add_topic("actuator_motors");
   add_topic("vehicle_thrust_setpoint");
   // add_topic("vehicle_torque_setpoint");

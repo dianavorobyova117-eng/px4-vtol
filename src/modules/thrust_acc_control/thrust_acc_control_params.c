@@ -157,7 +157,7 @@ PARAM_DEFINE_FLOAT(THR_SFT_RATE, 2.5f);
  * @max 10
  * @group Multicopter Rate Control
  */
-PARAM_DEFINE_INT32(THR_TMO_TIME, 2);
+PARAM_DEFINE_INT32(THR_TMO_TIME, 5);
 
 
 
