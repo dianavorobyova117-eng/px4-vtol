@@ -32,67 +32,67 @@
  ****************************************************************************/
 
 /**
-* @file tailsitter.h
-*
-* @author Roman Bapst 		<bapstroman@gmail.com>
-* @author David Vorsin     <davidvorsin@gmail.com>
-*
-*/
+ * @file tailsitter.h
+ *
+ * @author Roman Bapst 		<bapstroman@gmail.com>
+ * @author David Vorsin     <davidvorsin@gmail.com>
+ *
+ */
 
 #ifndef TAILSITTER_H
 #define TAILSITTER_H
 
-#include "vtol_type.h"
-
-#include <parameters/param.h>
 #include <drivers/drv_hrt.h>
+#include <parameters/param.h>
+
 #include <matrix/matrix/math.hpp>
 
-// [rad] Pitch threshold required for completing transition to fixed-wing in automatic transitions
-// static constexpr float PITCH_THRESHOLD_AUTO_TRANSITION_TO_FW = -1.05f; // -60°
-static constexpr float PITCH_THRESHOLD_AUTO_TRANSITION_TO_FW = -1.4f; // -60°
+#include "vtol_type.h"
 
-// [rad] Pitch threshold required for completing transition to hover in automatic transitions
-static constexpr float PITCH_THRESHOLD_AUTO_TRANSITION_TO_MC = -0.26f; // -15°
+// [rad] Pitch threshold required for completing transition to fixed-wing in
+// automatic transitions static constexpr float
+// PITCH_THRESHOLD_AUTO_TRANSITION_TO_FW = -1.05f; // -60°
+static constexpr float PITCH_THRESHOLD_AUTO_TRANSITION_TO_FW = -1.4f;  // -60°
 
-class Tailsitter : public VtolType
-{
+// [rad] Pitch threshold required for completing transition to hover in
+// automatic transitions
+static constexpr float PITCH_THRESHOLD_AUTO_TRANSITION_TO_MC = -0.26f;  // -15°
 
-public:
-	Tailsitter(VtolAttitudeControl *_att_controller);
-	~Tailsitter() override = default;
+class Tailsitter : public VtolType {
+ public:
+  Tailsitter(VtolAttitudeControl *_att_controller);
+  ~Tailsitter() override = default;
 
-	void update_vtol_state() override;
-	void update_transition_state() override;
-	void update_fw_state() override;
-	void fill_actuator_outputs() override;
-	void waiting_on_tecs() override;
+  void update_vtol_state() override;
+  void update_transition_state() override;
+  void update_fw_state() override;
+  void fill_actuator_outputs() override;
+  void waiting_on_tecs() override;
 
-private:
-	enum class vtol_mode {
-		MC_MODE = 0,			/**< vtol is in multicopter mode */
-		TRANSITION_FRONT_P1,		/**< vtol is in front transition part 1 mode */
-		TRANSITION_BACK,		/**< vtol is in back transition mode */
-		FW_MODE					/**< vtol is in fixed wing mode */
-	};
+ private:
+  enum class vtol_mode {
+    MC_MODE = 0,         /**< vtol is in multicopter mode */
+    TRANSITION_FRONT_P1, /**< vtol is in front transition part 1 mode */
+    TRANSITION_BACK,     /**< vtol is in back transition mode */
+    FW_MODE              /**< vtol is in fixed wing mode */
+  };
 
-	vtol_mode _vtol_mode{vtol_mode::MC_MODE};			/**< vtol flight mode, defined by enum vtol_mode */
+  vtol_mode _vtol_mode{
+      vtol_mode::MC_MODE}; /**< vtol flight mode, defined by enum vtol_mode */
 
-	bool _flag_was_in_trans_mode = false;	// true if mode has just switched to transition
+  bool _flag_was_in_trans_mode =
+      false;  // true if mode has just switched to transition
 
-	matrix::Quatf _q_trans_start;
-	matrix::Quatf _q_trans_sp;
-	matrix::Vector3f _trans_rot_axis;
+  matrix::Quatf _q_trans_start;
+  matrix::Quatf _q_trans_sp;
+  matrix::Vector3f _trans_rot_axis;
 
-	void parameters_update() override;
+  void parameters_update() override;
 
-	bool isFrontTransitionCompletedBase() override;
+  bool isFrontTransitionCompletedBase() override;
 
-	DEFINE_PARAMETERS_CUSTOM_PARENT(VtolType,
-					(ParamFloat<px4::params::FW_PSP_OFF>) _param_fw_psp_off,
-					(ParamFloat<px4::params::MPC_MAN_TILT_MAX>) _param_mpc_tilt_max
-				       )
-
-
+  DEFINE_PARAMETERS_CUSTOM_PARENT(
+      VtolType, (ParamFloat<px4::params::FW_PSP_OFF>)_param_fw_psp_off,
+      (ParamFloat<px4::params::MAN_TILT_Y_MAX>)_param_mpc_tilt_max)
 };
 #endif
