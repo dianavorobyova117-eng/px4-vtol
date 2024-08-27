@@ -50,7 +50,7 @@
  * @increment 0.001
  * @group Multicopter Rate Control
  */
-PARAM_DEFINE_FLOAT(PITCH_TORQUE_K, 0.025f);
+PARAM_DEFINE_FLOAT(PITCH_TORQUE_K, 0.005f);
 
 /**
  * Augment pitch control, bound, cannot be too large

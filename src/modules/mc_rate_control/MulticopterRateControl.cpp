@@ -75,7 +75,6 @@ void MulticopterRateControl::parameters_updated() {
   // rate control parameters
   // The controller gain K is used to convert the parallel (P + I/s + sD) form
   // to the ideal (K * [1 + 1/sTi + sTd]) form
-  _lp_filter_pitch_torque.set_cutoff_frequency(400.0f, 10.0f);
 
   const Vector3f rate_k =
       Vector3f(_param_mc_rollrate_k.get(), _param_mc_pitchrate_k.get(),
@@ -352,8 +351,8 @@ void MulticopterRateControl::Run() {
       _vehicle_acc_sub.update(&accel_velocity);
       float cm = -_pitch_torque_k * accel_velocity.xyz[0];
       _vel_pitch_notification.cm_not_filtered = cm;
-      cm = _lp_filter_pitch_torque.apply(cm);
       cm = math::constrain(cm, -_pitch_torque_bound, _pitch_torque_bound);
+      cm = mf.apply(cm);
       _vel_pitch_notification.cm = cm;
       _vel_pitch_notification.torque_raw = vehicle_torque_setpoint.xyz[1];
       _vel_pitch_notification.timestamp = hrt_absolute_time();

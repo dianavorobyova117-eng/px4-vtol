@@ -68,8 +68,7 @@
 #include <uORB/topics/vehicle_acceleration.h>
 #include <uORB/topics/vel_pitch_notification.h>
 
-#include <lib/mathlib/math/filter/LowPassFilter2p.hpp>
-
+#include <lib/mathlib/math/filter/MedianFilter.hpp>
 using namespace time_literals;
 
 class MulticopterRateControl : public ModuleBase<MulticopterRateControl>,
@@ -154,7 +153,6 @@ class MulticopterRateControl : public ModuleBase<MulticopterRateControl>,
 
   float _pitch_torque_k;
   float _pitch_torque_bound;
-  math::LowPassFilter2p<float> _lp_filter_pitch_torque;
   // keep setpoint values between updates
   matrix::Vector3f _acro_rate_max; /**< max attitude rates in acro mode */
   matrix::Vector3f _rates_setpoint{};
@@ -163,7 +161,7 @@ class MulticopterRateControl : public ModuleBase<MulticopterRateControl>,
   matrix::Vector3f _thrust_setpoint{};
   float _energy_integration_time{0.0f};
   float _control_energy[4]{};
-
+  math::MedianFilter<float, 5> mf;
   uORB::Publication<vel_pitch_notification_s> _vel_pitch_pub{
       ORB_ID(vel_pitch_notification)};
   vel_pitch_notification_s _vel_pitch_notification{};
