@@ -151,8 +151,6 @@ class MulticopterRateControl : public ModuleBase<MulticopterRateControl>,
 
   perf_counter_t _loop_perf; /**< loop duration performance counter */
 
-  float _pitch_torque_k;
-  float _pitch_torque_bound;
   // keep setpoint values between updates
   matrix::Vector3f _acro_rate_max; /**< max attitude rates in acro mode */
   matrix::Vector3f _rates_setpoint{};
@@ -179,8 +177,6 @@ class MulticopterRateControl : public ModuleBase<MulticopterRateControl>,
       (ParamFloat<px4::params::MC_PITCHRATE_D>)_param_mc_pitchrate_d,
       (ParamFloat<px4::params::MC_PITCHRATE_FF>)_param_mc_pitchrate_ff,
       (ParamFloat<px4::params::MC_PITCHRATE_K>)_param_mc_pitchrate_k,
-      (ParamFloat<px4::params::PITCH_TORQUE_K>)_param_pitch_torque_k,
-      (ParamFloat<px4::params::PITCH_TORQUE_BND>)_param_pitch_torque_bound,
 
       (ParamFloat<px4::params::MC_YAWRATE_P>)_param_mc_yawrate_p,
       (ParamFloat<px4::params::MC_YAWRATE_I>)_param_mc_yawrate_i,

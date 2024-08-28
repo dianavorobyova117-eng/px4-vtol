@@ -84,6 +84,9 @@ void ThrustAccControl::parameters_updated() {
   _is_sim = _param_thr_sim.get();
   _beta = _param_beta.get();
 
+  _pitch_torque_k = _param_pitch_torque_k.get();
+  _pitch_torque_bd = _param_pitch_torque_bd.get();
+
   _acc_limit = _param_thr_sft_acc.get();
   _rate_limit = _param_thr_sft_rate.get();
 
@@ -161,27 +164,15 @@ void ThrustAccControl::Run() {
       math::constrain(_du, -_delta_thr_bound, +_delta_thr_bound);
       _u = _du + _u_prev;
 
-      // TODO MPC phase compensation
-      // if (_thrust_acc_sp - last_thrust_sp > 0) {
-      //   if (_a_curr < _thrust_acc_sp + (float)(.3 * 1e-1)) {
-      //     _u += (float)(0.0005);
-      //   }
-      // } else if (_thrust_acc_sp - last_thrust_sp < 0) {
-      //   _u -= _u;
-      // } else {
-      //   _u = _u;
-      // }
-      // last_thrust_sp = _thrust_acc_sp;
-
       _u = (1 - _beta) * _u + _beta * _thr_model_ff;
       _u = math::constrain<float>(_u, 0.0, 1.0);
-      vehicle_rates_setpoint_s vehicle_rates_setpoint{};
-      vehicle_rates_setpoint.thrust_body[2] = -_u;
-      vehicle_rates_setpoint.roll = _rates_setpoint(0);
-      vehicle_rates_setpoint.pitch = _rates_setpoint(1);
-      vehicle_rates_setpoint.yaw = _rates_setpoint(2);
-      vehicle_rates_setpoint.timestamp = hrt_absolute_time();
-      _vehicle_rates_setpoint_pub.publish(vehicle_rates_setpoint);
+      pitch_ff_control(_thrust_acc_setpoint_msg.pitch_sp);
+      _vehicle_rates_setpoint.thrust_body[2] = -_u;
+      _vehicle_rates_setpoint.roll = _rates_setpoint(0);
+      _vehicle_rates_setpoint.pitch = _rates_setpoint(1);
+      _vehicle_rates_setpoint.yaw = _rates_setpoint(2);
+      _vehicle_rates_setpoint.timestamp = hrt_absolute_time();
+      _vehicle_rates_setpoint_pub.publish(_vehicle_rates_setpoint);
     } else {
       _u_prev = -_vehicle_thrust_setpoint_sub.get().xyz[2];
       _u = _u_prev;
@@ -206,6 +197,17 @@ void ThrustAccControl::safeAttitudeHolder() {
   matrix::Quatf q_sp = Eulerf(0.0, 0.0, yaw);
   _attitude_control.setAttitudeSetpoint(q_sp, 0.0);
   _rates_setpoint = _attitude_control.update(q_cur);
+}
+
+void ThrustAccControl::pitch_ff_control(float pitch_sp) {
+  matrix::Quatf q_cur(_vehicle_attitude_sub.get().q);
+  float pitch_cur = Eulerf(q_cur).theta();
+  float pitch_err = pitch_sp - pitch_cur;
+
+  // linear feedforward
+  // _rates_setpoint =
+  _vehicle_rates_setpoint.pitch_ff = math::constrain<float>(
+      _pitch_torque_k * pitch_err, -_pitch_torque_bd, _pitch_torque_bd);
 }
 
 bool ThrustAccControl::safeCheck() {

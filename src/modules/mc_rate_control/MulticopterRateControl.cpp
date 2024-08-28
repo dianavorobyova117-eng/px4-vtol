@@ -79,8 +79,6 @@ void MulticopterRateControl::parameters_updated() {
   const Vector3f rate_k =
       Vector3f(_param_mc_rollrate_k.get(), _param_mc_pitchrate_k.get(),
                _param_mc_yawrate_k.get());
-  _pitch_torque_k = _param_pitch_torque_k.get();
-  _pitch_torque_bound = _param_pitch_torque_bound.get();
   _rate_control.setPidGains(rate_k.emult(Vector3f(_param_mc_rollrate_p.get(),
                                                   _param_mc_pitchrate_p.get(),
                                                   _param_mc_yawrate_p.get())),
@@ -140,7 +138,6 @@ void MulticopterRateControl::Run() {
 
   /* run controller on gyro changes */
   vehicle_angular_velocity_s angular_velocity;
-  vehicle_acceleration_s accel_velocity;
 
   if (_vehicle_angular_velocity_sub.update(&angular_velocity)) {
     const hrt_abstime now = angular_velocity.timestamp_sample;
@@ -228,12 +225,7 @@ void MulticopterRateControl::Run() {
         // (double)_thrust_setpoint(2));
       }
     }
-    // PX4_INFO("thrust:%f %f
-    // %f",(double)_thrust_setpoint(0),(double)_thrust_setpoint(1),
-    // (double)_thrust_setpoint(2)); PX4_INFO("_rates_setpoint:%f %f
-    // %f",(double)_rates_setpoint(0),(double)_rates_setpoint(1),(double)_rates_setpoint(2));
-    // PX4_INFO("_rates_setpoint:%f",(double)_rates_setpoint(1));
-    // PX4_INFO("_rates_setpoint:%f",(double)_rates_setpoint(2));
+
     // run the rate controlle1
     if (_vehicle_control_mode.flag_control_rates_enabled) {
       // reset integral if disarmed
@@ -271,6 +263,8 @@ void MulticopterRateControl::Run() {
       // const Vector3f att_control = _rate_control.update(rates,
       // _rates_setpoint, angular_accel, dt, _maybe_landed || _landed); run rate
       // controller
+      _rate_control.setFeedForwardGain(
+          Vector3f(0.0f, vehicle_rates_setpoint.pitch_ff, 0.0f));
       Vector3f att_control = _rate_control.update(
           rates, _rates_setpoint, angular_accel, dt, _maybe_landed || _landed);
       // Update rate controller 2 nd to keep control signal
@@ -347,21 +341,6 @@ void MulticopterRateControl::Run() {
       vehicle_torque_setpoint.xyz[2] =
           PX4_ISFINITE(att_control(2)) ? att_control(2) : 0.f;
 
-      // rec pitch augment
-      _vehicle_acc_sub.update(&accel_velocity);
-      float cm = -_pitch_torque_k * accel_velocity.xyz[0];
-      _vel_pitch_notification.cm_not_filtered = cm;
-      cm = math::constrain(cm, -_pitch_torque_bound, _pitch_torque_bound);
-      cm = mf.apply(cm);
-      _vel_pitch_notification.cm = cm;
-      _vel_pitch_notification.torque_raw = vehicle_torque_setpoint.xyz[1];
-      _vel_pitch_notification.timestamp = hrt_absolute_time();
-      _vel_pitch_notification.torque = vehicle_torque_setpoint.xyz[1] + cm;
-      _vel_pitch_pub.publish(_vel_pitch_notification);
-      vehicle_torque_setpoint.xyz[1] =
-          PX4_ISFINITE(vehicle_torque_setpoint.xyz[1] + cm)
-              ? vehicle_torque_setpoint.xyz[1] + cm
-              : vehicle_torque_setpoint.xyz[1];
       // scale setpoints by battery status if enabled
       if (_param_mc_bat_scale_en.get()) {
         if (_battery_status_sub.updated()) {

@@ -39,31 +39,6 @@
  * @author Anton Babushkin <anton@px4.io>
  */
 
-/**
- * Augment pitch control, gain scaling factor
- *
- * used for cancelling out the aerodynamic pitch torque in pitch control
- *
- * @min 0.00
- * @max 0.05
- * @decimal 3
- * @increment 0.001
- * @group Multicopter Rate Control
- */
-PARAM_DEFINE_FLOAT(PITCH_TORQUE_K, 0.005f);
-
-/**
- * Augment pitch control, bound, cannot be too large
- *
- * used for cancelling out the aerodynamic pitch torque in pitch control
- *
- * @min 0.01
- * @max 0.15
- * @decimal 3
- * @increment 0.001
- * @group Multicopter Rate Control
- */
-PARAM_DEFINE_FLOAT(PITCH_TORQUE_BND, 0.05f);
 
 /**
  * Roll rate P gain

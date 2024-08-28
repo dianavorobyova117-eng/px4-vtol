@@ -171,3 +171,29 @@ PARAM_DEFINE_INT32(THR_TMO_TIME, 5);
  */
 PARAM_DEFINE_INT32(THR_SIM, 1);
 
+
+/**
+ * Pitch torque linear gain K
+ *
+ * Pitch torque linear gain K
+ *
+ * @min 0.000
+ * @max 0.3
+ * @decimal 3
+ * @increment 0.001
+ * @group Multicopter Rate Control
+ */
+PARAM_DEFINE_FLOAT(PITCH_TOR_K, 0.1f);
+
+/**
+ * Pitch torque Boundary
+ *
+ * Pitch torque Boundary
+ *
+ * @min 0.000
+ * @max 0.080
+ * @decimal 3
+ * @increment 0.001
+ * @group Multicopter Rate Control
+ */
+PARAM_DEFINE_FLOAT(PITCH_TOR_BD, 0.03f);

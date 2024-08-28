@@ -88,6 +88,7 @@ class ThrustAccControl : public ModuleBase<ThrustAccControl>,
   void resetFilters();
   bool safeCheck();
   void safeAttitudeHolder();
+  void pitch_ff_control(float pitch_sp);
   /**
    * initialize some vectors/matrices from parameters
    */
@@ -152,10 +153,14 @@ class ThrustAccControl : public ModuleBase<ThrustAccControl>,
   //   uint64
   float _acc_limit;
   float _rate_limit;
+
+  float _pitch_torque_k;
+  float _pitch_torque_bd;
+
   AlphaFilter<float> _rate_sft_filter;
   AlphaFilter<float> _acc_sft_filter;
   AttitudeControl _attitude_control;
-
+  vehicle_rates_setpoint_s _vehicle_rates_setpoint{};
   DEFINE_PARAMETERS(
       (ParamFloat<px4::params::MC_ROLL_P>)_param_mc_roll_p,
       (ParamFloat<px4::params::MC_PITCH_P>)_param_mc_pitch_p,
@@ -164,6 +169,9 @@ class ThrustAccControl : public ModuleBase<ThrustAccControl>,
       (ParamFloat<px4::params::MC_ROLLRATE_MAX>)_param_mc_rollrate_max,
       (ParamFloat<px4::params::MC_PITCHRATE_MAX>)_param_mc_pitchrate_max,
       (ParamFloat<px4::params::MC_YAWRATE_MAX>)_param_mc_yawrate_max,
+
+      (ParamFloat<px4::params::PITCH_TOR_K>)_param_pitch_torque_k,
+      (ParamFloat<px4::params::PITCH_TOR_BD>)_param_pitch_torque_bd,
 
       (ParamFloat<px4::params::THR_P>)_param_thr_p,
       (ParamFloat<px4::params::THR_TMO_ACC>)_param_thr_timeout_acc,
