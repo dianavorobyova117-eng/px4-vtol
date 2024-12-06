@@ -33,136 +33,126 @@
 
 #pragma once
 
-#include <gz/msgs/fluid_pressure.pb.h>
-#include <gz/msgs/imu.pb.h>
-#include <gz/msgs/odometry_with_covariance.pb.h>
-#include <lib/geo/geo.h>
+#include "GZMixingInterfaceESC.hpp"
+#include "GZMixingInterfaceServo.hpp"
+
 #include <px4_platform_common/atomic.h>
 #include <px4_platform_common/defines.h>
 #include <px4_platform_common/module.h>
 #include <px4_platform_common/module_params.h>
 #include <px4_platform_common/posix.h>
-#include <uORB/topics/differential_pressure.h>
+#include <px4_platform_common/px4_work_queue/ScheduledWorkItem.hpp>
+#include <lib/geo/geo.h>
+#include <uORB/PublicationMulti.hpp>
+#include <uORB/Subscription.hpp>
+#include <uORB/SubscriptionInterval.hpp>
 #include <uORB/topics/parameter_update.h>
+#include <uORB/topics/differential_pressure.h>
 #include <uORB/topics/sensor_accel.h>
-#include <uORB/topics/sensor_baro.h>
 #include <uORB/topics/sensor_gyro.h>
 #include <uORB/topics/vehicle_angular_velocity.h>
 #include <uORB/topics/vehicle_attitude.h>
 #include <uORB/topics/vehicle_global_position.h>
 #include <uORB/topics/vehicle_local_position.h>
+#include <uORB/topics/sensor_baro.h>
 #include <uORB/topics/vehicle_odometry.h>
 
 #include <gz/math.hh>
 #include <gz/msgs.hh>
 #include <gz/transport.hh>
-#include <px4_platform_common/px4_work_queue/ScheduledWorkItem.hpp>
-#include <uORB/PublicationMulti.hpp>
-#include <uORB/Subscription.hpp>
-#include <uORB/SubscriptionInterval.hpp>
 
-#include "GZMixingInterfaceESC.hpp"
-#include "GZMixingInterfaceServo.hpp"
+#include <gz/msgs/imu.pb.h>
+#include <gz/msgs/fluid_pressure.pb.h>
+#include <gz/msgs/odometry_with_covariance.pb.h>
 
 using namespace time_literals;
 
-class GZBridge : public ModuleBase<GZBridge>,
-                 public ModuleParams,
-                 public px4::ScheduledWorkItem {
- public:
-  GZBridge(const char *world, const char *name, const char *model,
-           const char *pose_str);
-  ~GZBridge() override;
+class GZBridge : public ModuleBase<GZBridge>, public ModuleParams, public px4::ScheduledWorkItem
+{
+public:
+	GZBridge(const char *world, const char *name, const char *model, const char *pose_str);
+	~GZBridge() override;
 
-  /** @see ModuleBase */
-  static int custom_command(int argc, char *argv[]);
+	/** @see ModuleBase */
+	static int custom_command(int argc, char *argv[]);
 
-  /** @see ModuleBase */
-  static int print_usage(const char *reason = nullptr);
+	/** @see ModuleBase */
+	static int print_usage(const char *reason = nullptr);
 
-  /** @see ModuleBase */
-  static int task_spawn(int argc, char *argv[]);
+	/** @see ModuleBase */
+	static int task_spawn(int argc, char *argv[]);
 
-  int init();
+	int init();
 
-  /** @see ModuleBase::print_status() */
-  int print_status() override;
+	/** @see ModuleBase::print_status() */
+	int print_status() override;
 
-  uint64_t world_time_us() const { return _world_time_us.load(); }
+	uint64_t world_time_us() const { return _world_time_us.load(); }
 
- private:
-  void Run() override;
+private:
 
-  bool updateClock(const uint64_t tv_sec, const uint64_t tv_nsec);
+	void Run() override;
 
-  void clockCallback(const gz::msgs::Clock &clock);
+	bool updateClock(const uint64_t tv_sec, const uint64_t tv_nsec);
 
-  // void airspeedCallback(const gz::msgs::AirSpeedSensor &air_pressure);
-  void barometerCallback(const gz::msgs::FluidPressure &air_pressure);
-  void imuCallback(const gz::msgs::IMU &imu);
-  void poseInfoCallback(const gz::msgs::Pose_V &pose);
-  void odometryCallback(const gz::msgs::OdometryWithCovariance &odometry);
+	void clockCallback(const gz::msgs::Clock &clock);
 
-  /**
-   *
-   * Convert a quaterion from FLU_to_ENU frames (ROS convention)
-   * to FRD_to_NED frames (PX4 convention)
-   *
-   * @param q_FRD_to_NED output quaterion in PX4 conventions
-   * @param q_FLU_to_ENU input quaterion in ROS conventions
-   */
-  static void rotateQuaternion(gz::math::Quaterniond &q_FRD_to_NED,
-                               const gz::math::Quaterniond q_FLU_to_ENU);
+	// void airspeedCallback(const gz::msgs::AirSpeedSensor &air_pressure);
+	void barometerCallback(const gz::msgs::FluidPressure &air_pressure);
+	void imuCallback(const gz::msgs::IMU &imu);
+	void poseInfoCallback(const gz::msgs::Pose_V &pose);
+	void odometryCallback(const gz::msgs::OdometryWithCovariance &odometry);
 
-  // Subscriptions
-  uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update),
-                                                   1_s};
+	/**
+	*
+	* Convert a quaterion from FLU_to_ENU frames (ROS convention)
+	* to FRD_to_NED frames (PX4 convention)
+	*
+	* @param q_FRD_to_NED output quaterion in PX4 conventions
+	* @param q_FLU_to_ENU input quaterion in ROS conventions
+	*/
+	static void rotateQuaternion(gz::math::Quaterniond &q_FRD_to_NED, const gz::math::Quaterniond q_FLU_to_ENU);
 
-  // uORB::Publication<differential_pressure_s>
-  // _differential_pressure_pub{ORB_ID(differential_pressure)};
-  uORB::Publication<vehicle_angular_velocity_s>
-      _angular_velocity_ground_truth_pub{
-          ORB_ID(vehicle_angular_velocity_groundtruth)};
-  uORB::Publication<vehicle_attitude_s> _attitude_ground_truth_pub{
-      ORB_ID(vehicle_attitude_groundtruth)};
-  uORB::Publication<vehicle_attitude_s> _attitude_pub{ORB_ID(vehicle_attitude)};
-  uORB::Publication<vehicle_global_position_s> _gpos_ground_truth_pub{
-      ORB_ID(vehicle_global_position_groundtruth)};
-  uORB::Publication<vehicle_local_position_s> _lpos_ground_truth_pub{
-      ORB_ID(vehicle_local_position_groundtruth)};
-  uORB::PublicationMulti<sensor_baro_s> _sensor_baro_pub{ORB_ID(sensor_baro)};
+	// Subscriptions
+	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
 
-  uORB::PublicationMulti<sensor_accel_s> _sensor_accel_pub{
-      ORB_ID(sensor_accel)};
-  uORB::PublicationMulti<sensor_gyro_s> _sensor_gyro_pub{ORB_ID(sensor_gyro)};
-  uORB::PublicationMulti<vehicle_odometry_s> _visual_odometry_pub{
-      ORB_ID(vehicle_visual_odometry)};
+	//uORB::Publication<differential_pressure_s>    _differential_pressure_pub{ORB_ID(differential_pressure)};
+	uORB::Publication<vehicle_angular_velocity_s> _angular_velocity_ground_truth_pub{ORB_ID(vehicle_angular_velocity_groundtruth)};
+	uORB::Publication<vehicle_attitude_s>         _attitude_ground_truth_pub{ORB_ID(vehicle_attitude_groundtruth)};
+	uORB::Publication<vehicle_global_position_s>  _gpos_ground_truth_pub{ORB_ID(vehicle_global_position_groundtruth)};
+	uORB::Publication<vehicle_local_position_s>   _lpos_ground_truth_pub{ORB_ID(vehicle_local_position_groundtruth)};
+	uORB::PublicationMulti<sensor_baro_s> _sensor_baro_pub{ORB_ID(sensor_baro)};
 
-  GZMixingInterfaceESC _mixing_interface_esc{_node, _node_mutex};
-  GZMixingInterfaceServo _mixing_interface_servo{_node, _node_mutex};
+	uORB::PublicationMulti<sensor_accel_s> _sensor_accel_pub{ORB_ID(sensor_accel)};
+	uORB::PublicationMulti<sensor_gyro_s>  _sensor_gyro_pub{ORB_ID(sensor_gyro)};
+	uORB::PublicationMulti<vehicle_odometry_s> _visual_odometry_pub{ORB_ID(vehicle_visual_odometry)};
 
-  px4::atomic<uint64_t> _world_time_us{0};
+	GZMixingInterfaceESC   _mixing_interface_esc{_node, _node_mutex};
+	GZMixingInterfaceServo _mixing_interface_servo{_node, _node_mutex};
 
-  pthread_mutex_t _node_mutex;
+	px4::atomic<uint64_t> _world_time_us{0};
 
-  MapProjection _pos_ref{};
+	pthread_mutex_t _node_mutex;
 
-  matrix::Vector3d _position_prev{};
-  matrix::Vector3d _velocity_prev{};
-  matrix::Vector3f _euler_prev{};
-  hrt_abstime _timestamp_prev{};
+	MapProjection _pos_ref{};
 
-  const std::string _world_name;
-  const std::string _model_name;
-  const std::string _model_sim;
-  const std::string _model_pose;
+	matrix::Vector3d _position_prev{};
+	matrix::Vector3d _velocity_prev{};
+	matrix::Vector3f _euler_prev{};
+	hrt_abstime _timestamp_prev{};
 
-  float _temperature{288.15};  // 15 degrees
+	const std::string _world_name;
+	const std::string _model_name;
+	const std::string _model_sim;
+	const std::string _model_pose;
 
-  gz::transport::Node _node;
+	float _temperature{288.15};  // 15 degrees
 
-  DEFINE_PARAMETERS(
-      (ParamFloat<px4::params::SIM_GZ_HOME_LAT>)_param_sim_home_lat,
-      (ParamFloat<px4::params::SIM_GZ_HOME_LON>)_param_sim_home_lon,
-      (ParamFloat<px4::params::SIM_GZ_HOME_ALT>)_param_sim_home_alt)
+	gz::transport::Node _node;
+
+	DEFINE_PARAMETERS(
+		(ParamFloat<px4::params::SIM_GZ_HOME_LAT>) _param_sim_home_lat,
+		(ParamFloat<px4::params::SIM_GZ_HOME_LON>) _param_sim_home_lon,
+		(ParamFloat<px4::params::SIM_GZ_HOME_ALT>) _param_sim_home_alt
+	)
 };
