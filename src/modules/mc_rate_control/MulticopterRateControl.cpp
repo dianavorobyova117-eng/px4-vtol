@@ -101,6 +101,30 @@ void MulticopterRateControl::parameters_updated() {
   _acro_rate_max = Vector3f(radians(_param_mc_acro_r_max.get()),
                             radians(_param_mc_acro_p_max.get()),
                             radians(_param_mc_acro_y_max.get()));
+
+  // control notch filter parameters
+  if (_param_ctrl_nf_x_frq.get() > 0.f && _param_ctrl_nf_x_bw.get() > 0.f) {
+    _x_ctrl_notch_filter.setParameters(_param_imu_gyro_ratemax.get(),
+                                       _param_ctrl_nf_x_frq.get(),
+                                       _param_ctrl_nf_x_bw.get());
+  } else {
+    _x_ctrl_notch_filter.disable();
+  }
+  if (_param_ctrl_nf_y_frq.get() > 0.f && _param_ctrl_nf_y_bw.get() > 0.f) {
+    _y_ctrl_notch_filter.setParameters(_param_imu_gyro_ratemax.get(),
+                                       _param_ctrl_nf_y_frq.get(),
+                                       _param_ctrl_nf_y_bw.get());
+  } else {
+    _y_ctrl_notch_filter.disable();
+  }
+
+  if (_param_ctrl_nf_z_frq.get() > 0.f && _param_ctrl_nf_z_bw.get() > 0.f) {
+    _z_ctrl_notch_filter.setParameters(_param_imu_gyro_ratemax.get(),
+                                       _param_ctrl_nf_z_frq.get(),
+                                       _param_ctrl_nf_z_bw.get());
+  } else {
+    _z_ctrl_notch_filter.disable();
+  }
 }
 
 void MulticopterRateControl::chirpSignalGenerator(
@@ -263,12 +287,22 @@ void MulticopterRateControl::Run() {
       // const Vector3f att_control = _rate_control.update(rates,
       // _rates_setpoint, angular_accel, dt, _maybe_landed || _landed); run rate
       // controller
-      _rate_control.setFeedForwardGain(
-          Vector3f(0.0f, vehicle_rates_setpoint.pitch_ff, 0.0f));
+
       Vector3f att_control = _rate_control.update(
           rates, _rates_setpoint, angular_accel, dt, _maybe_landed || _landed);
       // Update rate controller 2 nd to keep control signal
       Vector3f att_control_kept = att_control;
+
+      // rec: add notch control filters
+      if (_x_ctrl_notch_filter.initialized()) {
+        att_control(0) = _x_ctrl_notch_filter.apply(att_control(0));
+      }
+      if (_y_ctrl_notch_filter.initialized()) {
+        att_control(1) = _y_ctrl_notch_filter.apply(att_control(1));
+      }
+      if (_z_ctrl_notch_filter.initialized()) {
+        att_control(2) = _z_ctrl_notch_filter.apply(att_control(2));
+      }
 
       // lyu: add chirp signal and publish if enable the pre-set channel
       if (_param_chirp_en.get() > 0) {

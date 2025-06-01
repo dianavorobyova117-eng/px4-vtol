@@ -525,3 +525,114 @@ PARAM_DEFINE_FLOAT(MC_RATEX_LPF_FRQ, 30.0f);
  * @group Multicopter Rate Control
  */
 PARAM_DEFINE_FLOAT(MC_RATEZ_LPF_FRQ, 25.0f);
+
+
+
+/**
+* Notch filter bandwidth for ctrl signal in x axis
+*
+* The frequency width of the stop band for the 2nd order notch filter on the primary gyro.
+* See "CTRL_X_NF_FRQ" to activate the filter and to set the notch frequency.
+* Applies to angular velocity sent to the controllers.
+*
+* @min 0
+* @max 100
+* @unit Hz
+* @reboot_required true
+* @group Sensors
+*/
+PARAM_DEFINE_FLOAT(CTRL_X_NF_BW, 2.0f);
+
+/**
+* Notch filter bandwidth for ctrl signal in x axis
+*
+* The center frequency for the 2nd order notch filter on the primary gyro.
+* This filter can be enabled to avoid feedback amplification of structural resonances at a specific frequency.
+* This only affects the signal sent to the controllers, not the estimators.
+* Applies to angular velocity sent to the controllers.
+* See "CTRL_X_NF_BW" to set the bandwidth of the filter.
+*
+* A value of 0 disables the filter.
+*
+* @min 0
+* @max 1000
+* @unit Hz
+* @reboot_required true
+* @group Sensors
+*/
+PARAM_DEFINE_FLOAT(CTRL_X_NF_FRQ, 0.0f);
+
+
+/**
+* Notch filter bandwidth for ctrl signal in x axis
+*
+* The frequency width of the stop band for the 2nd order notch filter on the primary gyro.
+* See "CTRL_Y_NF_FRQ" to activate the filter and to set the notch frequency.
+* Applies to angular velocity sent to the controllers.
+*
+* @min 0
+* @max 100
+* @unit Hz
+* @reboot_required true
+* @group Sensors
+*/
+PARAM_DEFINE_FLOAT(CTRL_Y_NF_BW, 2.0f);
+
+/**
+* Notch filter bandwidth for ctrl signal in x axis
+*
+* The center frequency for the 2nd order notch filter on the primary gyro.
+* This filter can be enabled to avoid feedback amplification of structural resonances at a specific frequency.
+* This only affects the signal sent to the controllers, not the estimators.
+* Applies to angular velocity sent to the controllers.
+* See "CTRL_Y_NF_BW" to set the bandwidth of the filter.
+*
+* A value of 0 disables the filter.
+*
+* @min 0
+* @max 1000
+* @unit Hz
+* @reboot_required true
+* @group Sensors
+*/
+PARAM_DEFINE_FLOAT(CTRL_Y_NF_FRQ, 0.0f);
+
+
+
+
+
+
+
+/**
+* Notch filter bandwidth for ctrl signal in x axis
+*
+* The frequency width of the stop band for the 2nd order notch filter on the primary gyro.
+* See "CTRL_X_NF_FRQ" to activate the filter and to set the notch frequency.
+* Applies to angular velocity sent to the controllers.
+*
+* @min 0
+* @max 100
+* @unit Hz
+* @reboot_required true
+* @group Sensors
+*/
+PARAM_DEFINE_FLOAT(CTRL_Z_NF_BW, 2.0f);
+
+/**
+* Notch filter bandwidth for ctrl signal in x axis
+*
+* The center frequency for the 2nd order notch filter on the primary gyro.
+* This filter can be enabled to avoid feedback amplification of structural resonances at a specific frequency.
+* This only affects the signal sent to the controllers, not the estimators.
+* Applies to angular velocity sent to the controllers.
+* See "CTRL_X_NF_BW" to set the bandwidth of the filter.
+*
+* A value of 0 disables the filter.
+*
+* @min 0
+* @max 1000
+* @unit Hz
+* @reboot_required true
+* @group Sensors
+*/
+PARAM_DEFINE_FLOAT(CTRL_Z_NF_FRQ, 0.0f);

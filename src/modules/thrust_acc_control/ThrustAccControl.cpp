@@ -166,7 +166,6 @@ void ThrustAccControl::Run() {
 
       _u = (1 - _beta) * _u + _beta * _thr_model_ff;
       _u = math::constrain<float>(_u, 0.0, 1.0);
-      pitch_ff_control(_thrust_acc_setpoint_msg.pitch_sp);
       _vehicle_rates_setpoint.thrust_body[2] = -_u;
       _vehicle_rates_setpoint.roll = _rates_setpoint(0);
       _vehicle_rates_setpoint.pitch = _rates_setpoint(1);
@@ -197,17 +196,6 @@ void ThrustAccControl::safeAttitudeHolder() {
   matrix::Quatf q_sp = Eulerf(0.0, 0.0, yaw);
   _attitude_control.setAttitudeSetpoint(q_sp, 0.0);
   _rates_setpoint = _attitude_control.update(q_cur);
-}
-
-void ThrustAccControl::pitch_ff_control(float pitch_sp) {
-  matrix::Quatf q_cur(_vehicle_attitude_sub.get().q);
-  float pitch_cur = Eulerf(q_cur).theta();
-  float pitch_err = pitch_sp - pitch_cur;
-
-  // linear feedforward
-  // _rates_setpoint =
-  _vehicle_rates_setpoint.pitch_ff = math::constrain<float>(
-      _pitch_torque_k * pitch_err, -_pitch_torque_bd, _pitch_torque_bd);
 }
 
 bool ThrustAccControl::safeCheck() {

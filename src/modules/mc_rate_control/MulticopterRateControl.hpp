@@ -66,9 +66,9 @@
 #include <uORB/topics/esc_status.h>
 #include <uORB/topics/mc_rate_ctrl_debug.h>
 #include <uORB/topics/vehicle_acceleration.h>
-#include <uORB/topics/vel_pitch_notification.h>
 
 #include <lib/mathlib/math/filter/MedianFilter.hpp>
+#include <lib/mathlib/math/filter/NotchFilter.hpp>
 using namespace time_literals;
 
 class MulticopterRateControl : public ModuleBase<MulticopterRateControl>,
@@ -160,9 +160,10 @@ class MulticopterRateControl : public ModuleBase<MulticopterRateControl>,
   float _energy_integration_time{0.0f};
   float _control_energy[4]{};
   math::MedianFilter<float, 5> mf;
-  uORB::Publication<vel_pitch_notification_s> _vel_pitch_pub{
-      ORB_ID(vel_pitch_notification)};
-  vel_pitch_notification_s _vel_pitch_notification{};
+  math::NotchFilter<float> _x_ctrl_notch_filter;
+  math::NotchFilter<float> _y_ctrl_notch_filter;
+  math::NotchFilter<float> _z_ctrl_notch_filter;
+
   DEFINE_PARAMETERS(
       (ParamFloat<px4::params::MC_ROLLRATE_P>)_param_mc_rollrate_p,
       (ParamFloat<px4::params::MC_ROLLRATE_I>)_param_mc_rollrate_i,
@@ -170,6 +171,14 @@ class MulticopterRateControl : public ModuleBase<MulticopterRateControl>,
       (ParamFloat<px4::params::MC_ROLLRATE_D>)_param_mc_rollrate_d,
       (ParamFloat<px4::params::MC_ROLLRATE_FF>)_param_mc_rollrate_ff,
       (ParamFloat<px4::params::MC_ROLLRATE_K>)_param_mc_rollrate_k,
+
+      (ParamFloat<px4::params::CTRL_X_NF_BW>)_param_ctrl_nf_x_bw,
+      (ParamFloat<px4::params::CTRL_X_NF_FRQ>)_param_ctrl_nf_x_frq,
+      (ParamFloat<px4::params::CTRL_Y_NF_BW>)_param_ctrl_nf_y_bw,
+      (ParamFloat<px4::params::CTRL_Y_NF_FRQ>)_param_ctrl_nf_y_frq,
+      (ParamFloat<px4::params::CTRL_Z_NF_BW>)_param_ctrl_nf_z_bw,
+      (ParamFloat<px4::params::CTRL_Z_NF_FRQ>)_param_ctrl_nf_z_frq,
+      (ParamInt<px4::params::IMU_GYRO_RATEMAX>)_param_imu_gyro_ratemax,
 
       (ParamFloat<px4::params::MC_PITCHRATE_P>)_param_mc_pitchrate_p,
       (ParamFloat<px4::params::MC_PITCHRATE_I>)_param_mc_pitchrate_i,

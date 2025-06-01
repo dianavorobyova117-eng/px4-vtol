@@ -88,7 +88,6 @@ class ThrustAccControl : public ModuleBase<ThrustAccControl>,
   void resetFilters();
   bool safeCheck();
   void safeAttitudeHolder();
-  void pitch_ff_control(float pitch_sp);
   /**
    * initialize some vectors/matrices from parameters
    */
