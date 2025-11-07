@@ -11,17 +11,13 @@ set -e
 ## - jMAVSim and Gazebo9 simulator (omit with arg: --no-sim-tools)
 ##
 
-INSTALL_NUTTX="true"
+INSTALL_NUTTX="false"
 INSTALL_SIM="true"
 INSTALL_ARCH=`uname -m`
 
 # Parse arguments
 for arg in "$@"
 do
-	if [[ $arg == "--no-nuttx" ]]; then
-		INSTALL_NUTTX="false"
-	fi
-
 	if [[ $arg == "--no-sim-tools" ]]; then
 		INSTALL_SIM="false"
 	fi
@@ -42,36 +38,18 @@ fi
 # script directory
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-# check requirements.txt exists (script not run in source tree)
-REQUIREMENTS_FILE="requirements.txt"
-if [[ ! -f "${DIR}/${REQUIREMENTS_FILE}" ]]; then
-	echo "FAILED: ${REQUIREMENTS_FILE} needed in same directory as ubuntu.sh (${DIR})."
-	return 1
-fi
+# # check requirements.txt exists (script not run in source tree)
+# REQUIREMENTS_FILE="requirements.txt"
+# if [[ ! -f "${DIR}/${REQUIREMENTS_FILE}" ]]; then
+# 	echo "FAILED: ${REQUIREMENTS_FILE} needed in same directory as ubuntu.sh (${DIR})."
+# 	return 1
+# fi
 
 
 # check ubuntu version
 # otherwise warn and point to docker?
-UBUNTU_RELEASE="`lsb_release -rs`"
+UBUNTU_RELEASE="22.04"
 
-if [[ "${UBUNTU_RELEASE}" == "14.04" ]]; then
-	echo "Ubuntu 14.04 is no longer supported"
-	exit 1
-elif [[ "${UBUNTU_RELEASE}" == "16.04" ]]; then
-	echo "Ubuntu 16.04 is no longer supported"
-	exit 1
-elif [[ "${UBUNTU_RELEASE}" == "18.04" ]]; then
-	echo "Ubuntu 18.04 is no longer supported"
-	exit 1
-elif [[ "${UBUNTU_RELEASE}" == "20.04" ]]; then
-	echo "Ubuntu 20.04 is no longer supported"
-	exit 1
-elif [[ "${UBUNTU_RELEASE}" == "22.04" ]]; then
-	echo "Ubuntu 22.04"
-fi
-
-
-echo
 echo "Installing PX4 general dependencies"
 
 sudo apt-get update -y --quiet
@@ -113,82 +91,6 @@ else
 	python3 -m pip install --user -r ${DIR}/requirements.txt
 fi
 
-# NuttX toolchain (arm-none-eabi-gcc)
-if [[ $INSTALL_NUTTX == "true" ]]; then
-
-	echo
-	echo "Installing NuttX dependencies"
-
-	sudo DEBIAN_FRONTEND=noninteractive apt-get -y --quiet --no-install-recommends install \
-		automake \
-		binutils-dev \
-		bison \
-		build-essential \
-		flex \
-		g++-multilib \
-		gcc-multilib \
-		gdb-multiarch \
-		genromfs \
-		gettext \
-		gperf \
-		libelf-dev \
-		libexpat-dev \
-		libgmp-dev \
-		libisl-dev \
-		libmpc-dev \
-		libmpfr-dev \
-		libncurses5 \
-		libncurses5-dev \
-		libncursesw5-dev \
-		libtool \
-		pkg-config \
-		screen \
-		texinfo \
-		u-boot-tools \
-		util-linux \
-		vim-common \
-		;
-	if [[ "${UBUNTU_RELEASE}" == "20.04" || "${UBUNTU_RELEASE}" == "22.04" ]]; then
-		sudo DEBIAN_FRONTEND=noninteractive apt-get -y --quiet --no-install-recommends install \
-		kconfig-frontends \
-		;
-	fi
-
-
-	if [ -n "$USER" ]; then
-		# add user to dialout group (serial port access)
-		sudo usermod -a -G dialout $USER
-	fi
-
-	# arm-none-eabi-gcc
-	NUTTX_GCC_VERSION="9-2020-q2-update"
-	NUTTX_GCC_VERSION_SHORT="9-2020q2"
-
-	source $HOME/.profile # load changed path for the case the script is reran before relogin
-	if [ $(which arm-none-eabi-gcc) ]; then
-		GCC_VER_STR=$(arm-none-eabi-gcc --version)
-		GCC_FOUND_VER=$(echo $GCC_VER_STR | grep -c "${NUTTX_GCC_VERSION}")
-	fi
-
-	if [[ "$GCC_FOUND_VER" == "1" ]]; then
-		echo "arm-none-eabi-gcc-${NUTTX_GCC_VERSION} found, skipping installation"
-
-	else
-		echo "Installing arm-none-eabi-gcc-${NUTTX_GCC_VERSION}";
-		wget -O /tmp/gcc-arm-none-eabi-${NUTTX_GCC_VERSION}-linux.tar.bz2 https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/${NUTTX_GCC_VERSION_SHORT}/gcc-arm-none-eabi-${NUTTX_GCC_VERSION}-${INSTALL_ARCH}-linux.tar.bz2 && \
-			sudo tar -jxf /tmp/gcc-arm-none-eabi-${NUTTX_GCC_VERSION}-linux.tar.bz2 -C /opt/;
-
-		# add arm-none-eabi-gcc to user's PATH
-		exportline="export PATH=/opt/gcc-arm-none-eabi-${NUTTX_GCC_VERSION}/bin:\$PATH"
-
-		if grep -Fxq "$exportline" $HOME/.profile; then
-			echo "${NUTTX_GCC_VERSION} path already set.";
-		else
-			echo $exportline >> $HOME/.profile;
-			source $HOME/.profile; # Allows to directly build NuttX targets in the same terminal
-		fi
-	fi
-fi
 
 if [[ $INSTALL_SIM == "true" ]]; then
 
@@ -211,9 +113,6 @@ if [[ $INSTALL_SIM == "true" ]]; then
 	# Install Gazebo
 	gazebo_packages="gz-harmonic libunwind-dev"
 
-	if [[ "${UBUNTU_RELEASE}" == "24.04" ]]; then
-		gazebo_packages="$gazebo_packages cppzmq-dev"
-	fi
 
 	sudo DEBIAN_FRONTEND=noninteractive apt-get -y --quiet --no-install-recommends install \
 		dmidecode \
