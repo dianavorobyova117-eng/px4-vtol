@@ -11,17 +11,8 @@ set -e
 ## - jMAVSim and Gazebo9 simulator (omit with arg: --no-sim-tools)
 ##
 
-INSTALL_NUTTX="false"
 INSTALL_SIM="true"
 INSTALL_ARCH=`uname -m`
-
-# Parse arguments
-for arg in "$@"
-do
-	if [[ $arg == "--no-sim-tools" ]]; then
-		INSTALL_SIM="false"
-	fi
-done
 
 # detect if running in docker
 if [ -f /.dockerenv ]; then
@@ -38,18 +29,19 @@ fi
 # script directory
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-# # check requirements.txt exists (script not run in source tree)
-# REQUIREMENTS_FILE="requirements.txt"
-# if [[ ! -f "${DIR}/${REQUIREMENTS_FILE}" ]]; then
-# 	echo "FAILED: ${REQUIREMENTS_FILE} needed in same directory as ubuntu.sh (${DIR})."
-# 	return 1
-# fi
+# check requirements.txt exists (script not run in source tree)
+REQUIREMENTS_FILE="requirements.txt"
+if [[ ! -f "${DIR}/${REQUIREMENTS_FILE}" ]]; then
+	echo "FAILED: ${REQUIREMENTS_FILE} needed in same directory as ubuntu.sh (${DIR})."
+	return 1
+fi
 
 
 # check ubuntu version
 # otherwise warn and point to docker?
-UBUNTU_RELEASE="22.04"
+UBUNTU_RELEASE="`lsb_release -rs`"
 
+echo
 echo "Installing PX4 general dependencies"
 
 sudo apt-get update -y --quiet
@@ -91,28 +83,64 @@ else
 	python3 -m pip install --user -r ${DIR}/requirements.txt
 fi
 
-
+# Simulation tools
 if [[ $INSTALL_SIM == "true" ]]; then
 
-	echo "[ubuntu.sh] Installing PX4 simulation dependencies"
+	echo
+	echo "Installing PX4 simulation dependencies"
 
 	# General simulation dependencies
 	sudo DEBIAN_FRONTEND=noninteractive apt-get -y --quiet --no-install-recommends install \
 		bc \
 		;
 
-	# Gazebo
-	# Expects Ubuntu 22.04 > by default
-	echo "[ubuntu.sh] Gazebo (Harmonic) will be installed"
-	echo "[ubuntu.sh] Earlier versions will be removed"
-	# Add Gazebo binary repository
-	sudo wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
-	echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
-	sudo apt-get update -y --quiet
+	if [[ "${UBUNTU_RELEASE}" == "18.04" ]]; then
+		java_version=11
+	elif [[ "${UBUNTU_RELEASE}" == "20.04" ]]; then
+		java_version=13
+	elif [[ "${UBUNTU_RELEASE}" == "22.04" ]]; then
+		java_version=11
+	else
+		java_version=14
+	fi
+	# Java (jmavsim)
+	sudo DEBIAN_FRONTEND=noninteractive apt-get -y --quiet --no-install-recommends install \
+		ant \
+		openjdk-$java_version-jre \
+		openjdk-$java_version-jdk \
+		libvecmath-java \
+		;
 
-	# Install Gazebo
-	gazebo_packages="gz-harmonic libunwind-dev"
+	# Set Java 11 as default
+	sudo update-alternatives --set java $(update-alternatives --list java | grep "java-$java_version")
 
+	# Gazebo / Gazebo classic installation
+	if [[ "${UBUNTU_RELEASE}" == "22.04" ]]; then
+		echo "Gazebo (Garden) will be installed"
+		echo "Earlier versions will be removed"
+		# Add Gazebo binary repository
+		sudo wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
+		echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
+		sudo apt-get update -y --quiet
+
+		# Install Gazebo
+		gazebo_packages="gz-garden"
+	else
+		sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
+		wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
+		# Update list, since new gazebo-stable.list has been added
+		sudo apt-get update -y --quiet
+
+		# Install Gazebo classic
+		if [[ "${UBUNTU_RELEASE}" == "18.04" ]]; then
+			gazebo_classic_version=9
+			gazebo_packages="gazebo$gazebo_classic_version libgazebo$gazebo_classic_version-dev"
+		else
+			# default and Ubuntu 20.04
+			gazebo_classic_version=11
+			gazebo_packages="gazebo$gazebo_classic_version libgazebo$gazebo_classic_version-dev"
+		fi
+	fi
 
 	sudo DEBIAN_FRONTEND=noninteractive apt-get -y --quiet --no-install-recommends install \
 		dmidecode \
@@ -136,4 +164,9 @@ if [[ $INSTALL_SIM == "true" ]]; then
 		echo "export SVGA_VGPU10=0" >> ~/.profile
 	fi
 
+fi
+
+if [[ $INSTALL_NUTTX == "true" ]]; then
+	echo
+	echo "Relogin or reboot computer before attempting to build NuttX targets"
 fi
