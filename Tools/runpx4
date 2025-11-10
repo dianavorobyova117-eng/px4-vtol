@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "Please make sure that you run this command at the root of your px4 project.!!!"
 
 if [ -z "$1" ]; then
     echo "No GUI Required, HEADLESS=1."
@@ -11,8 +12,6 @@ else
     fi
     HEADLESSVal=0
 fi
-
-cd $PX4_ROOT
 
 
 # start communication 
