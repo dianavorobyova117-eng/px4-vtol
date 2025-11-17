@@ -13,9 +13,10 @@ PX4_GZ_WORLD=${PX4_GZ_WORLD:=default}
 PX4_SIM_MODEL=${PX4_SIM_MODEL:=tailsitter}
 
 param set-default MAV_TYPE 20
-
 param set-default SIM_GZ_EN 1
 
+# not fuse sideslip
+param set-default EKF2_FUSE_BETA 0
 #  * Board rotation
 #  *
 #  * This parameter defines the rotation of the FMU board relative to the platform.
@@ -31,7 +32,7 @@ param set-default SENS_BOARD_ROT 24  # pitch rotation 90 deg
 #  * @group VTOL Attitude Control
 #  */
 ## TODO low pitch don't use!
-param set-default VT_ELEV_MC_LOCK 0  # unlock elevon servo
+#param set-default VT_ELEV_MC_LOCK 0  # unlock elevon servo
 
 # simulation gps
 param set-default SENS_EN_GPSSIM 1
@@ -43,7 +44,7 @@ param set-default SENS_EN_MAGSIM 1
 param set-default SENS_EN_ARSPDSIM 1
 
 # tailsitter setting to solve airspeed sim
-param set-default HILAB_ARSPDROT 1
+# param set-default HILAB_ARSPDROT 1
 # bypass the flight checks without airspeed sensor
 # param set-default CBRK_AIRSPD_CHK 162128
 

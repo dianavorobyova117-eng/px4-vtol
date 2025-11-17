@@ -47,64 +47,6 @@
         </material>
       </visual>
 
-      <!-- debug visuals for leg collisions -->
-      <!-- <visual name="leg1_visual">
-        <pose>-0.26 -0.25 -0.32 0 0 0</pose>
-        <geometry>
-          <sphere>
-            <radius>0.01</radius>
-          </sphere>
-        </geometry>
-        <material>
-          <ambient>0 0 1 1</ambient>
-          <diffuse>0 0 1 1</diffuse>
-          <emissive>0 0 1 1</emissive>
-          <specular>0 0 1 1</specular>
-        </material>
-      </visual>
-      <visual name="leg2_visual">
-        <pose>-0.26 0.25 0.32 0 0 0</pose>
-        <geometry>
-          <sphere>
-            <radius>0.01</radius>
-          </sphere>
-        </geometry>
-        <material>
-          <ambient>1 0 0 1</ambient>
-          <diffuse>1 0 0 1</diffuse>
-          <emissive>1 0 0 1</emissive>
-          <specular>1 0 0 1</specular>
-        </material>
-      </visual>
-      <visual name="leg3_visual">
-        <pose>-0.26 0.25 -0.32 0 0 0</pose>
-        <geometry>
-          <sphere>
-            <radius>0.01</radius>
-          </sphere>
-        </geometry>
-        <material>
-          <ambient>1 1 0 1</ambient>
-          <diffuse>1 1 0 1</diffuse>
-          <emissive>1 1 0 1</emissive>
-          <specular>1 1 0 1</specular>
-        </material>
-      </visual>
-      <visual name="leg4_visual">
-        <pose>-0.26 -0.25 0.32 0 0 0</pose>
-        <geometry>
-          <sphere>
-            <radius>0.01</radius>
-          </sphere>
-        </geometry>
-        <material>
-          <ambient>0 1 0 1</ambient>
-          <diffuse>0 1 0 1</diffuse>
-          <emissive>0 1 0 1</emissive>
-          <specular>0 1 0 1</specular>
-        </material>
-      </visual> -->
-
       <collision
         name="leg1_collision">
         <pose>-0.26 -0.25 -0.32 0 0 0</pose>
@@ -142,95 +84,6 @@
         </geometry>
       </collision>
 
-      <!-- box visual and collision for horizontal calibration -->
-      <!-- <visual name="box_visual">
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.6 0.6 0.6</size>
-          </box>
-        </geometry>
-        <material>
-          <ambient>0 1 0 0.9</ambient>
-          <diffuse>0 1 0 0.9</diffuse>
-          <specular>0 1 0 0.9</specular>
-        </material>
-      </visual> -->
-      <!-- <collision name="box_collision">
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.6 0.6 0.6</size>
-          </box>
-        </geometry>
-      </collision> -->
-
-      <!-- debug visuals for lift-drag -->
-      <!-- <visual name="cp_wing_visual">
-        <pose>-0.025 0 0 0 0 0</pose>
-        <geometry>
-          <sphere>
-            <radius>0.045</radius>
-          </sphere>
-        </geometry>
-        <material>
-          <ambient>0 0 1</ambient>
-          <diffuse>0 0 1</diffuse>
-          <specular>0.1 0.1 0.1 1</specular>
-        </material>
-      </visual>
-      <visual name="cp_left_winglet_visual">
-        <pose>-0.14 0.59 0.035 0 0 0</pose>
-        <geometry>
-          <sphere>
-            <radius>0.01</radius>
-          </sphere>
-        </geometry>
-        <material>
-          <ambient>1 0 0 1</ambient>
-          <diffuse>1 0 0 1</diffuse>
-          <specular>0.1 0.1 0.1 1</specular>
-        </material>
-      </visual>
-      <visual name="cp_right_winglet_visual">
-        <pose>-0.14 -0.59 0.035 0 0 0</pose>
-        <geometry>
-          <sphere>
-            <radius>0.01</radius>
-          </sphere>
-        </geometry>
-        <material>
-          <ambient>0 1 0 1</ambient>
-          <diffuse>0 1 0 1</diffuse>
-          <specular>0.1 0.1 0.1 1</specular>
-        </material>
-      </visual>
-      <visual name="cp_left_vstab_visual">
-        <pose>-0.07 0.25 0 0 0 0</pose>
-        <geometry>
-          <sphere>
-            <radius>0.02</radius>
-          </sphere>
-        </geometry>
-        <material>
-          <ambient>1 0 0</ambient>
-          <diffuse>1 0 0</diffuse>
-          <specular>0.1 0.1 0.1 1</specular>
-        </material>
-      </visual>
-      <visual name="cp_right_vstab_visual">
-        <pose>-0.07 -0.25 0 0 0 0</pose>
-        <geometry>
-          <sphere>
-            <radius>0.02</radius>
-          </sphere>
-        </geometry>
-        <material>
-          <ambient>0 1 0</ambient>
-          <diffuse>0 1 0</diffuse>
-          <specular>0.1 0.1 0.1 1</specular>
-        </material>
-      </visual> -->
       <sensor
         name="air_pressure_sensor" type="air_pressure">
         <always_on>1</always_on>
@@ -252,55 +105,6 @@
         <visualize>true</visualize>
       </sensor>
     </link>
-
-
-<!-- not work -->
-    <!-- <link name="airspeed_link">
-      <pose relative_to="airspeed_joint">0 0 0 0 0 0</pose>
-      <inertial>
-        <pose>0 0 0 0 0 0</pose>
-        <mass>0.015</mass>
-        <inertia>
-          <ixx>1e-05</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1e-05</iyy>
-          <iyz>0</iyz>
-          <izz>1e-05</izz>
-        </inertia>
-      </inertial>
-      <visual name="airspeed_visual">
-        <geometry>
-          <cylinder>
-            <radius>0.01</radius>
-            <length>0.1</length>
-          </cylinder>
-        </geometry>
-        <material>
-          <ambient>0 0 0 1.0</ambient>
-          <diffuse>0 0 0 1.0</diffuse>
-        </material>
-      </visual>
-      <sensor name="air_speed_sensor" type="air_speed">
-        <always_on>1</always_on>
-        <update_rate>15.0</update_rate>
-        <enable_metrics>true</enable_metrics>
-        <air_speed>
-          <airspeed>
-            <noise type="gaussian">
-              <mean>0</mean>
-              <stddev>0.01</stddev>
-            </noise>
-          </airspeed>
-        </air_speed>
-      </sensor>
-    </link>
-    <joint name='airspeed_joint' type='fixed'>
-      <pose relative_to="base_link">0 0 0 1.5 0 0</pose>
-      <child>airspeed_link</child>
-      <parent>base_link</parent>
-    </joint> -->
-
 
     <!-- https://ardupilot.org/plane/docs/guide-tailsitter.html#nyt-quad-x-motor-tailsitter -->
     <!-- CCW -->
@@ -335,20 +139,7 @@
           </cylinder>
         </geometry>
       </collision>
-      <!-- debug visuals for motor identification -->
-      <!-- <visual name="motor_visual">
-        <geometry>
-          <cylinder>
-            <length>0.0178</length>
-            <radius>0.0112</radius>
-          </cylinder>
-        </geometry>
-        <material>
-          <ambient>0 0 1 1</ambient>
-          <diffuse>0 0 1 1</diffuse>
-          <specular>0 0 1 1</specular>
-        </material>
-      </visual> -->
+
       <visual name="motor_visual">
         <pose>0 0 -0.008 0 -1.5707963 0</pose>
         <geometry>
@@ -452,20 +243,6 @@
           </cylinder>
         </geometry>
       </collision>
-      <!-- debug visuals for motor identification -->
-      <!-- <visual name="motor_visual">
-        <geometry>
-          <cylinder>
-            <length>0.0178</length>
-            <radius>0.0112</radius>
-          </cylinder>
-        </geometry>
-        <material>
-          <ambient>1 0 0 1</ambient>
-          <diffuse>1 0 0 1</diffuse>
-          <specular>1 0 0 1</specular>
-        </material>
-      </visual> -->
       <visual name="motor_visual">
         <pose>0 0 -0.008 0 -1.5707963 0</pose>
         <geometry>
@@ -568,20 +345,6 @@
           </cylinder>
         </geometry>
       </collision>
-      <!-- debug visuals for motor identification -->
-      <!-- <visual name="motor_visual">
-        <geometry>
-          <cylinder>
-            <length>0.0178</length>
-            <radius>0.0112</radius>
-          </cylinder>
-        </geometry>
-        <material>
-          <ambient>1 1 0 1</ambient>
-          <diffuse>1 1 0 1</diffuse>
-          <specular>1 1 0 1</specular>
-        </material>
-      </visual> -->
       <visual name="motor_visual">
         <pose>0 0 -0.008 0 -1.5707963 0</pose>
         <geometry>
@@ -684,20 +447,6 @@
           </cylinder>
         </geometry>
       </collision>
-      <!-- debug visuals for motor identification -->
-      <!-- <visual name="motor_visual">
-        <geometry>
-          <cylinder>
-            <length>0.0178</length>
-            <radius>0.0112</radius>
-          </cylinder>
-        </geometry>
-        <material>
-          <ambient>0 1 0 1</ambient>
-          <diffuse>0 1 0 1</diffuse>
-          <specular>0 1 0 1</specular>
-        </material>
-      </visual> -->
       <visual name="motor_visual">
         <pose>0 0 -0.008 0 -1.5707963 0</pose>
         <geometry>
@@ -841,7 +590,6 @@
       name="gz::sim::systems::JointStatePublisher">
     </plugin>
 
-<!-- LYU: temp remove aerodynamic -->
     <plugin filename="libAerodynamicsPlugin" name="gz::sim::systems::AerodynamicsPlugin">
       <link_name>base_link</link_name>
       <area>0.24</area>
@@ -857,199 +605,5 @@
       <!-- 3 for Adavanced Lift Drag plugin -->
       <aero_id>2</aero_id>
     </plugin>
-
-
-    <!-- <plugin filename="gz-sim-advanced-lift-drag-system" name="gz::sim::systems::AdvancedLiftDrag">
-      <a0>0.0</a0>
-      <AR>8.5</AR>
-      <eff>0.97</eff>
-      <CL0>0.15188</CL0>
-      <CLa>5.015</CLa>
-      <CLb>-0.01</CLb>
-      <CLa_stall>-3.85</CLa_stall>
-      <CLp>0.0</CLp>
-      <CLq>0</CLq>
-      <CLr>0.0</CLr>
-      <cda>1.5</cda>
-      <CD0>0.15</CD0>
-      <CDp>0.0</CDp>
-      <CDq>0.0</CDq>
-      <CDr>0.0</CDr>
-      <CDa_stall>-0.9233984055</CDa_stall>
-
-      <CYb>-0.258244</CYb>
-      <CYp>0.0</CYp>
-      <CYq>0.0</CYq>
-      <CYr>0.0</CYr>
-
-      <Cem0>0.0</Cem0>
-      <Cema>0.0</Cema>
-      <Cellb>0.0</Cellb>
-      <Cenb>0.0</Cenb>
-      <Cellp>-0.0</Cellp>
-      <Cemp>0.0</Cemp>
-      <Cenp>0.0</Cenp>
-      <Cellq>0.0</Cellq>
-      <Cemq>0.0</Cemq>
-      <Cenq>0.0</Cenq>
-      <Cellr>0.0</Cellr>
-      <Cemr>0.0</Cemr>
-      <Cenr>0.0</Cenr>
-      <alpha_stall>0.03</alpha_stall>
-      <Cema_stall>0</Cema_stall>
-      <ref_pt>-0.12 0.0 0.0</ref_pt>
-      <area>1.0</area>
-      <mac>0.22</mac>
-      <air_density>1.168</air_density>
-      <forward>1 0 0</forward>
-      <upward>0 0 1</upward>
-      <link_name>base_link</link_name>
-      <num_ctrl_surfaces>0</num_ctrl_surfaces>
-    </plugin> -->
-      </model>
+  </model>
 </sdf>
-
-
-<!-- LYU: add control face -->
-    <link name="left_elevon">
-      <inertial>
-        <mass>0.00000001</mass>
-        <inertia>
-          <ixx>0.000001</ixx>
-          <ixy>0.0</ixy>
-          <iyy>0.000001</iyy>
-          <ixz>0.0</ixz>
-          <iyz>0.0</iyz>
-          <izz>0.000001</izz>
-        </inertia>
-        <pose relative_to="base_link">0 0.3 0 0.0 0 0</pose>
-        <!-- <pose>0 0.3 0 0.00 0 0.0</pose> -->
-      </inertial>
-      <visual name='left_elevon_visual'>
-        <pose>-0.21 -0.005 -0.085 1.58 0 2.65</pose>
-        <!-- <pose>-0.105 0.004 -0.034 1.5707963268 0 3.1415926536</pose> -->
-        <geometry>
-          <mesh>
-            <scale>0.001 0.003 0.0005</scale>
-            <uri>model://standard_vtol/meshes/x8_elevon_left.dae</uri>
-          </mesh>
-        </geometry>
-        <material>
-          <ambient>0 0 1 1.0</ambient>
-          <diffuse>0 0 1 1.0</diffuse>
-        </material>
-      </visual>
-    </link>
-    <link name="right_elevon">
-      <inertial>
-        <mass>0.00000001</mass>
-        <inertia>
-          <ixx>0.000001</ixx>
-          <ixy>0.0</ixy>
-          <iyy>0.000001</iyy>
-          <ixz>0.0</ixz>
-          <iyz>0.0</iyz>
-          <izz>0.000001</izz>
-        </inertia>
-        <pose relative_to="base_link">0 -0.3 0 0.0 0 0</pose>
-        <!-- <pose>0 -0.3 0 0.00 0 0.0</pose> -->
-      </inertial>
-      <visual name='right_elevon_visual'>
-        <!-- <pose>0.281 -1.032 -0.034 1.5707963268 0 3.1415926536</pose> -->
-        <!-- <pose>-0.20 -0.005 -0.085 1.57 0 2.65</pose> -->
-        <pose>0.38 -0.267 -0.089 1.57 0 -2.65</pose>
-        <geometry>
-          <mesh>
-            <!-- <scale>0.001 0.001 0.001</scale> -->
-            <scale>0.001 0.003 0.0005</scale>
-            <uri>model://standard_vtol/meshes/x8_elevon_right.dae</uri>
-          </mesh>
-        </geometry>
-        <material>
-          <ambient>0 0 1 1.0</ambient>
-          <diffuse>0 0 1 1.0</diffuse>
-        </material>
-      </visual>
-    </link>
-    <link name="elevator">
-      <inertial>
-        <mass>0.00000001</mass>
-        <inertia>
-          <ixx>0.000001</ixx>
-          <ixy>0.0</ixy>
-          <iyy>0.000001</iyy>
-          <ixz>0.0</ixz>
-          <iyz>0.0</iyz>
-          <izz>0.000001</izz>
-        </inertia>
-        <!-- <pose> -0.5 0 0 0.00 0 0.0 </pose> -->
-        <pose relative_to="base_link">-0.5 0 0 0.00 0 0.0</pose>
-      </inertial>
-    </link>
-    <joint name='servo_0' type='revolute'>
-      <parent>base_link</parent>
-      <child>left_elevon</child>
-      <!-- <pose>-0.18 0.6 -0.005 0 0 0.265</pose> -->
-      <!-- <pose>-0.12 0.6 0 0 0 0</pose> -->
-      <pose relative_to="base_link">-0.12 0.4 0 0 0 0</pose>
-      <axis>
-        <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.53</lower>
-          <upper>0.53</upper>
-        </limit>
-        <dynamics>
-          <damping>1.000</damping>
-        </dynamics>
-      </axis>
-      <physics>
-        <ode>
-          <implicit_spring_damper>1</implicit_spring_damper>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='servo_1' type='revolute'>
-      <parent>base_link</parent>
-      <child>right_elevon</child>
-      <!-- <pose>-0.18 -0.6 -0.005 0 0 -0.265</pose> -->
-      <!-- <pose>-0.12 -0.6 0 0 0 0</pose> -->
-      <pose relative_to="base_link">-0.12 -0.4 0 0 0 0</pose>
-      <axis>
-        <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.53</lower>
-          <upper>0.53</upper>
-        </limit>
-        <dynamics>
-          <damping>1.000</damping>
-        </dynamics>
-      </axis>
-      <physics>
-        <ode>
-          <implicit_spring_damper>1</implicit_spring_damper>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='servo_2' type='revolute'>
-      <parent>base_link</parent>
-      <child>elevator</child>
-      <pose> -0.5 0 0 0 0 0</pose>
-      <axis>
-        <xyz>0 1 0</xyz>
-        <limit>
-          <!-- -30/+30 deg. -->
-          <lower>-0.53</lower>
-          <upper>0.53</upper>
-        </limit>
-        <dynamics>
-          <damping>1.000</damping>
-        </dynamics>
-      </axis>
-      <physics>
-        <ode>
-          <implicit_spring_damper>1</implicit_spring_damper>
-        </ode>
-      </physics>
-    </joint>
-
-
