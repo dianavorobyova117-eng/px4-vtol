@@ -585,9 +585,9 @@
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
       <motorType>velocity</motorType>
     </plugin>
-    <!-- plugins -->
-    <plugin filename="gz-sim-joint-state-publisher-system"
-      name="gz::sim::systems::JointStatePublisher">
+
+    <plugin filename="libWindEffectsPlugin" name="gz::sim::systems::WindEffects">
+      <linkName>base_link</linkName>
     </plugin>
 
     <plugin filename="libAerodynamicsPlugin" name="gz::sim::systems::AerodynamicsPlugin">
