@@ -79,10 +79,14 @@ private:
 
 	void parameters_update() override;
 
-	DEFINE_PARAMETERS_CUSTOM_PARENT(VtolType,
+	// DEFINE_PARAMETERS_CUSTOM_PARENT(VtolType,
+	// 				(ParamFloat<px4::params::VT_PSHER_SLEW>) _param_vt_psher_slew,
+	// 				(ParamFloat<px4::params::VT_B_TRANS_RAMP>) _param_vt_b_trans_ramp
+	// 				(ParamFloat<px4::params::FW_PSP_OFF>) _param_fw_psp_off
+	// 			       )
+		DEFINE_PARAMETERS_CUSTOM_PARENT(VtolType,
 					(ParamFloat<px4::params::VT_PSHER_SLEW>) _param_vt_psher_slew,
-					(ParamFloat<px4::params::VT_B_TRANS_RAMP>) _param_vt_b_trans_ramp,
-					(ParamFloat<px4::params::FW_PSP_OFF>) _param_fw_psp_off
+					(ParamFloat<px4::params::VT_B_TRANS_RAMP>) _param_vt_b_trans_ramp
 				       )
 };
 #endif

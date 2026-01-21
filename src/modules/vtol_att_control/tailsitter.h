@@ -91,8 +91,18 @@ class Tailsitter : public VtolType {
 
   bool isFrontTransitionCompletedBase() override;
 
-  DEFINE_PARAMETERS_CUSTOM_PARENT(
-      VtolType, (ParamFloat<px4::params::FW_PSP_OFF>)_param_fw_psp_off,
-      (ParamFloat<px4::params::MAN_TILT_Y_MAX>)_param_mpc_tilt_max)
+//   DEFINE_PARAMETERS_CUSTOM_PARENT(
+//       VtolType
+//       , (ParamFloat<px4::params::FW_PSP_OFF>)_param_fw_psp_off,
+//       (ParamFloat<px4::params::MAN_TILT_Y_MAX>)_param_mpc_tilt_max)
+// };
+
+DEFINE_PARAMETERS_CUSTOM_PARENT(VtolType,
+        (ParamFloat<px4::params::VT_F_TRANS_DUR>) _param_vt_f_trans_dur
+    )
+
+    // 手动定义被删掉或不存在的参数变量，确保 .cpp 能编译通过
+    float _param_fw_psp_off{0.0f};
+    float _param_mpc_tilt_max{0.0f};
 };
 #endif

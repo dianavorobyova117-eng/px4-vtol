@@ -16,8 +16,8 @@ publications:
   # - topic: /fmu/out/position_setpoint_triplet
   #   type: px4_msgs::msg::PositionSetpointTriplet
 
-  # - topic: /fmu/out/sensor_combined
-  #   type: px4_msgs::msg::SensorCombined
+  - topic: /fmu/out/sensor_combined
+    type: px4_msgs::msg::SensorCombined
 
   - topic: /fmu/out/timesync_status
     type: px4_msgs::msg::TimesyncStatus
@@ -47,8 +47,8 @@ publications:
   # - topic: /fmu/out/vehicle_attitude_setpoint
   #   type: px4_msgs::msg::VehicleAttitudeSetpoint
 
-  # - topic: /fmu/out/vehicle_angular_velocity
-  #   type: px4_msgs::msg::VehicleAngularVelocity
+  - topic: /fmu/out/vehicle_angular_velocity
+    type: px4_msgs::msg::VehicleAngularVelocity
 
   # - topic: /fmu/out/vehicle_rates_setpoint
   #   type: px4_msgs::msg::VehicleRatesSetpoint
