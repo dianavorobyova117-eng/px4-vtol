@@ -82,7 +82,6 @@ void ThrustAccControl::parameters_updated() {
   _timeout_acc = _param_thr_timeout_acc.get();
   _timeout_time = _param_sys_timeout_time.get() * 1e5;
   _is_sim = _param_thr_sim.get();
-  _beta = _param_beta.get();
 
   _pitch_torque_k = _param_pitch_torque_k.get();
   _pitch_torque_bd = _param_pitch_torque_bd.get();
@@ -160,11 +159,34 @@ void ThrustAccControl::Run() {
       _u_prev = -_vehicle_thrust_setpoint_sub.get().xyz[2];
       // change to FLU setting
       _a_curr = -_vacc_sub.get().xyz[2];
-      float _du = (_thrust_acc_sp - _a_curr) * _thr_p;
-      math::constrain(_du, -_delta_thr_bound, +_delta_thr_bound);
-      _u = _du + _u_prev;
+        // --- MRAC 开始 ---
 
-      _u = (1 - _beta) * _u + _beta * _thr_model_ff;
+        // 1. 参考模型演进 (Euler integration)
+        // a_model_dot = -Am * a_model + Bm * r
+        float a_model_dot = -_am * _a_model + _bm * _thrust_acc_sp;
+        _a_model += a_model_dot * dt;
+
+        // 2. 计算跟踪误差
+        float error = _a_curr - _a_model;
+
+        // 3. 自适应律更新 (带简单的死区防止噪声积分)
+        if (fabsf(error) > 0.1f) {
+            _kr -= _gamma_r * _thrust_acc_sp * error * dt;
+            _kx -= _gamma_x * _a_curr * error * dt;
+        }
+
+        // 4. 防止增益发散 (Projection Operator 简化版)
+        _kr = math::constrain(_kr, 0.01f, 2.0f);
+        _kx = math::constrain(_kx, -1.0f, 1.0f);
+
+        // 5. 计算控制输出
+        // u = kr * r + kx * x
+        _u = _kr * _thrust_acc_sp + _kx * _a_curr;
+
+        // --- MRAC 结束 ---
+
+
+      
       _u = math::constrain<float>(_u, 0.0, 1.0);
       _vehicle_rates_setpoint.thrust_body[2] = -_u;
       _vehicle_rates_setpoint.roll = _rates_setpoint(0);

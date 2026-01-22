@@ -156,6 +156,17 @@ class ThrustAccControl : public ModuleBase<ThrustAccControl>,
   float _pitch_torque_k;
   float _pitch_torque_bd;
 
+  // MARC part;
+  float _a_model{0.0f};
+  float _kr{0.5f};
+  float _kx{0.0f};
+
+  float _gamma_r{0.01f};
+  float _gamma_x{0.0f};
+  float _am{2.0f};
+  float _bm{2.0f};
+
+
   AlphaFilter<float> _rate_sft_filter;
   AlphaFilter<float> _acc_sft_filter;
   AttitudeControl _attitude_control;
@@ -171,7 +182,12 @@ class ThrustAccControl : public ModuleBase<ThrustAccControl>,
 
       (ParamFloat<px4::params::PITCH_TOR_K>)_param_pitch_torque_k,
       (ParamFloat<px4::params::PITCH_TOR_BD>)_param_pitch_torque_bd,
-
+      //MARC params
+      (ParamFloat<px4::params::THR_GAMMA_R>)_param_thr_gamma_r,
+      (ParamFloat<px4::params::THR_GAMMA_X>)_param_thr_gamma_x,
+      (ParamFloat<px4::params::THR_A_M>)_param_thr_a_m,
+      (ParamFloat<px4::params::THR_B_M>)_param_thr_b_m,
+      //
       (ParamFloat<px4::params::THR_P>)_param_thr_p,
       (ParamFloat<px4::params::THR_TMO_ACC>)_param_thr_timeout_acc,
       (ParamFloat<px4::params::GYROX_CUTOFF>)_param_imu_gyro_cutoff,
