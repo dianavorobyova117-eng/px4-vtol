@@ -100,7 +100,7 @@ foreach (_variableName ${_variableNames})
     endif()
 endforeach()
 
-remove_definitions(-Werror)
+remove_definitions()
 
 px4_add_module(
 	MODULE drivers__cyphal

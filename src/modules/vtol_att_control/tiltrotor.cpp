@@ -281,7 +281,15 @@ void Tiltrotor::update_transition_state()
 		_mc_roll_weight = 1.0f;
 		_mc_yaw_weight = 1.0f;
 
-		if (!_param_fw_arsp_mode.get()  && PX4_ISFINITE(_airspeed_validated->calibrated_airspeed_m_s) &&
+		// if (!_param_fw_arsp_mode.get()  && PX4_ISFINITE(_airspeed_validated->calibrated_airspeed_m_s) &&
+		//     _airspeed_validated->calibrated_airspeed_m_s >= _param_vt_arsp_blend.get()) {
+		// 	const float weight = 1.0f - (_airspeed_validated->calibrated_airspeed_m_s - _param_vt_arsp_blend.get()) /
+		// 			     (_param_vt_arsp_trans.get()  - _param_vt_arsp_blend.get());
+		// 	_mc_roll_weight = weight;
+		// 	_mc_yaw_weight = weight;
+		// }
+
+		if (!false  && PX4_ISFINITE(_airspeed_validated->calibrated_airspeed_m_s) &&
 		    _airspeed_validated->calibrated_airspeed_m_s >= _param_vt_arsp_blend.get()) {
 			const float weight = 1.0f - (_airspeed_validated->calibrated_airspeed_m_s - _param_vt_arsp_blend.get()) /
 					     (_param_vt_arsp_trans.get()  - _param_vt_arsp_blend.get());
@@ -289,8 +297,15 @@ void Tiltrotor::update_transition_state()
 			_mc_yaw_weight = weight;
 		}
 
+
 		// without airspeed do timed weight changes
-		if ((_param_fw_arsp_mode.get() || !PX4_ISFINITE(_airspeed_validated->calibrated_airspeed_m_s)) &&
+		// if ((_param_fw_arsp_mode.get() || !PX4_ISFINITE(_airspeed_validated->calibrated_airspeed_m_s)) &&
+		//     _time_since_trans_start > getMinimumFrontTransitionTime()) {
+		// 	_mc_roll_weight = 1.0f - (_time_since_trans_start - getMinimumFrontTransitionTime()) /
+		// 			  (getOpenLoopFrontTransitionTime() - getMinimumFrontTransitionTime());
+		// 	_mc_yaw_weight = _mc_roll_weight;
+		// }
+				if ((false || !PX4_ISFINITE(_airspeed_validated->calibrated_airspeed_m_s)) &&
 		    _time_since_trans_start > getMinimumFrontTransitionTime()) {
 			_mc_roll_weight = 1.0f - (_time_since_trans_start - getMinimumFrontTransitionTime()) /
 					  (getOpenLoopFrontTransitionTime() - getMinimumFrontTransitionTime());

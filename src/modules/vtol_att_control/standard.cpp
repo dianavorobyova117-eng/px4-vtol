@@ -217,15 +217,19 @@ void Standard::update_transition_state()
 				    _airspeed_trans_blend_margin;
 			// time based blending when no airspeed sensor is set
 
-		} else if (_param_fw_arsp_mode.get() || !PX4_ISFINITE(_airspeed_validated->calibrated_airspeed_m_s)) {
+		// } else if (_param_fw_arsp_mode.get() || !PX4_ISFINITE(_airspeed_validated->calibrated_airspeed_m_s)) {
+		// 	mc_weight = 1.0f - _time_since_trans_start / getMinimumFrontTransitionTime();
+		// 	mc_weight = math::constrain(2.0f * mc_weight, 0.0f, 1.0f);
+		
+		} else if (false|| !PX4_ISFINITE(_airspeed_validated->calibrated_airspeed_m_s)) {
 			mc_weight = 1.0f - _time_since_trans_start / getMinimumFrontTransitionTime();
 			mc_weight = math::constrain(2.0f * mc_weight, 0.0f, 1.0f);
 
 		}
 
 		// ramp up FW_PSP_OFF
-		_v_att_sp->pitch_body = math::radians(_param_fw_psp_off.get()) * (1.0f - mc_weight);
-
+		// _v_att_sp->pitch_body = math::radians(_param_fw_psp_off.get()) * (1.0f - mc_weight);
+		_v_att_sp->pitch_body = 0.0f;
 		_v_att_sp->thrust_body[0] = _pusher_throttle;
 
 		const Quatf q_sp(Eulerf(_v_att_sp->roll_body, _v_att_sp->pitch_body, _v_att_sp->yaw_body));

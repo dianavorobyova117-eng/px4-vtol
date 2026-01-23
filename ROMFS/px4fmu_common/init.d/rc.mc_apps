@@ -58,15 +58,17 @@ control_allocator start
 #
 mc_rate_control start
 
+thrust_acc_control start
+
 #
 # Start Multicopter Attitude Controller.
 #
 mc_att_control start
 
-if param greater -s MC_AT_EN 0
-then
-	mc_autotune_attitude_control start
-fi
+# if param greater -s MC_AT_EN 0
+# then
+# 	mc_autotune_attitude_control start
+# fi
 
 #
 # Start Multicopter Position Controller.
@@ -79,4 +81,8 @@ mc_pos_control start
 # Start Multicopter Land Detector.
 #
 land_detector start multicopter
-thrust_acc_control start
+
+sleep(3)
+
+uxrce_dds_client start -d /dev/ttyS3 -b 921600
+#

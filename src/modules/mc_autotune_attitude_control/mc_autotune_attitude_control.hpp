@@ -182,7 +182,7 @@ private:
 		(ParamInt<px4::params::MC_AT_APPLY>) _param_mc_at_apply,
 		(ParamFloat<px4::params::MC_AT_RISE_TIME>) _param_mc_at_rise_time,
 
-		(ParamFloat<px4::params::IMU_GYRO_CUTOFF>) _param_imu_gyro_cutoff,
+		(ParamFloat<px4::params::GYRO_CUTOFF>) _param_imu_gyro_cutoff,
 
 		(ParamFloat<px4::params::MC_ROLLRATE_P>) _param_mc_rollrate_p,
 		(ParamFloat<px4::params::MC_ROLLRATE_K>) _param_mc_rollrate_k,

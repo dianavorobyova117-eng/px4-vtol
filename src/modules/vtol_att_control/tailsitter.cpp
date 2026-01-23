@@ -92,7 +92,7 @@ void Tailsitter::update_vtol_state()
 
 			// if doing transition in Stabilized mode set threshold to max angle plus 5° margin
 			if (!_v_control_mode->flag_control_altitude_enabled) {
-				pitch_threshold_mc = math::radians(-_param_mpc_tilt_max.get() - 5.f);
+				pitch_threshold_mc = math::radians(-_param_mpc_tilt_max - 5.f);
 			}
 
 			// check if we have reached pitch angle to switch to MC mode
@@ -218,7 +218,8 @@ void Tailsitter::update_transition_state()
 		// lyu: TODO: optimization
 		const float trans_pitch_rate = M_PI_2_F / math::max(_param_vt_f_trans_dur.get(), 0.1f);
 
-		if (tilt < M_PI_2_F - math::radians(_param_fw_psp_off.get())) {
+		// if (tilt < M_PI_2_F - math::radians(_param_fw_psp_off.get())) {
+		if (tilt < M_PI_2_F - math::radians(0.0f)) {
 			// lyu: temp use for debug, TODO: modify here
 			const float max_tilt = math::min(_time_since_trans_start * trans_pitch_rate, 1.5f);
 			_q_trans_sp = Quatf(AxisAnglef(_trans_rot_axis, max_tilt)) * _q_trans_start;
@@ -354,8 +355,11 @@ void Tailsitter::fill_actuator_outputs()
 
 bool Tailsitter::isFrontTransitionCompletedBase()
 {
+	// const bool airspeed_triggers_transition = PX4_ISFINITE(_airspeed_validated->calibrated_airspeed_m_s)
+	// 		&& !_param_fw_arsp_mode.get() ;
+
 	const bool airspeed_triggers_transition = PX4_ISFINITE(_airspeed_validated->calibrated_airspeed_m_s)
-			&& !_param_fw_arsp_mode.get() ;
+			&& !false;
 
 	bool transition_to_fw = false;
 	const float pitch = Eulerf(Quatf(_v_att->q)).theta();
@@ -364,7 +368,7 @@ bool Tailsitter::isFrontTransitionCompletedBase()
 
 	// if doing transition in Stabilized mode set threshold to max angle minus 5° margin
 	if (!_v_control_mode->flag_control_altitude_enabled) {
-		pitch_threshold_fw = math::radians(-_param_mpc_tilt_max.get() + 5.f);
+		pitch_threshold_fw = math::radians(-_param_mpc_tilt_max + 5.f);
 	}
 
 	if (pitch <= pitch_threshold_fw) {

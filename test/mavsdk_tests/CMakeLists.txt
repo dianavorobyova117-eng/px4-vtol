@@ -39,7 +39,7 @@ if(MAVSDK_FOUND)
         PRIVATE
             -Wall
             -Wextra
-            -Werror
+            
             -Wno-error=deprecated-declarations
     )
 else()
