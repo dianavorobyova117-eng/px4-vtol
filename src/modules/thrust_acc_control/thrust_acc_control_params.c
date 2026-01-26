@@ -197,3 +197,16 @@ PARAM_DEFINE_FLOAT(PITCH_TOR_K, 0.1f);
  * @group Multicopter Rate Control
  */
 PARAM_DEFINE_FLOAT(PITCH_TOR_BD, 0.03f);
+
+/**
+ * Thrust gamma relative
+ *
+ * 这参数用于推力与加速度控制循环中的 gamma 修正系数。
+ *
+ * @min 0.0
+ * @max 2.0
+ * @decimal 3
+ * @increment 0.01
+ * @group Thrust Acc Control
+ */
+PARAM_DEFINE_FLOAT(THR_GAMMA_R, 0.5f);
