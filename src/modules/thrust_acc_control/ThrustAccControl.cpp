@@ -161,7 +161,8 @@ void ThrustAccControl::Run() {
       _a_curr = -_vacc_sub.get().xyz[2];
 
       // Calculate dt for MRAC integration
-      const hrt_abstime timestamp = _vehicle_angular_velocity_sub.get().timestamp;
+      _vehicle_angular_velocity_sub.copy(&_ang_vel);
+      const hrt_abstime timestamp = _ang_vel.timestamp;
       float dt = (timestamp - _timestamp_prev) / 1e6f;
       _timestamp_prev = timestamp;
 
