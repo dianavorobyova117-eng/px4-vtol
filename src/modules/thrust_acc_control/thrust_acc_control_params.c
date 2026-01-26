@@ -209,7 +209,7 @@ PARAM_DEFINE_FLOAT(PITCH_TOR_BD, 0.03f);
  * @increment 0.01
  * @group Thrust Acc Control
  */
-PARAM_DEFINE_FLOAT(THR_GAMMA_R, 0.5f);
+PARAM_DEFINE_FLOAT(THR_GAMMA_R, 0.01f);
 
 /**
  * Thrust gamma X
@@ -220,7 +220,7 @@ PARAM_DEFINE_FLOAT(THR_GAMMA_R, 0.5f);
  * @increment 0.01
  * @group Thrust Acc Control
  */
-PARAM_DEFINE_FLOAT(THR_GAMMA_X, 0.5f);
+PARAM_DEFINE_FLOAT(THR_GAMMA_X, 0.0f);
 
 /**
  * Thrust model coefficient A (Slope)
@@ -231,7 +231,7 @@ PARAM_DEFINE_FLOAT(THR_GAMMA_X, 0.5f);
  * @increment 0.001
  * @group Thrust Acc Control
  */
-PARAM_DEFINE_FLOAT(THR_A_M, 1.0f);
+PARAM_DEFINE_FLOAT(THR_A_M, 2.0f);
 
 /**
  * Thrust model coefficient B (Offset)
@@ -242,4 +242,4 @@ PARAM_DEFINE_FLOAT(THR_A_M, 1.0f);
  * @increment 0.001
  * @group Thrust Acc Control
  */
-PARAM_DEFINE_FLOAT(THR_B_M, 0.0f);
+PARAM_DEFINE_FLOAT(THR_B_M, 2.0f);
