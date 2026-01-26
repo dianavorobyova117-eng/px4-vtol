@@ -159,6 +159,17 @@ void ThrustAccControl::Run() {
       _u_prev = -_vehicle_thrust_setpoint_sub.get().xyz[2];
       // change to FLU setting
       _a_curr = -_vacc_sub.get().xyz[2];
+
+      // Calculate dt for MRAC integration
+      const hrt_abstime timestamp = _vehicle_angular_velocity_sub.get().timestamp;
+      float dt = (timestamp - _timestamp_prev) / 1e6f;
+      _timestamp_prev = timestamp;
+
+      // Guard against invalid dt (first run or large gap)
+      if (dt < 0.0001f || dt > 0.1f) {
+        dt = 1.0f / _param_imu_gyro_rate_max.get();
+      }
+
         // --- MRAC 开始 ---
 
         // 1. 参考模型演进 (Euler integration)
