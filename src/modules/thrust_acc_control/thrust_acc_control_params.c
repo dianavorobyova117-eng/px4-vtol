@@ -210,7 +210,7 @@ PARAM_DEFINE_FLOAT(PITCH_TOR_BD, 0.03f);
  * @increment 0.1
  * @group Thrust Acc Control
  */
-PARAM_DEFINE_FLOAT(THR_MRAC_REF_MODEL_AM, 5.0f);
+PARAM_DEFINE_FLOAT(THR_MRAC_RM_AM, 5.0f);
 
 /**
  * MRAC Reference Model Coefficient B (Gain)
@@ -224,7 +224,7 @@ PARAM_DEFINE_FLOAT(THR_MRAC_REF_MODEL_AM, 5.0f);
  * @increment 0.1
  * @group Thrust Acc Control
  */
-PARAM_DEFINE_FLOAT(THR_MRAC_REF_MODEL_BM, 5.0f);
+PARAM_DEFINE_FLOAT(THR_MRAC_RM_BM, 5.0f);
 
 /**
  * MRAC Adaptation Gain for Kr (Feedforward)
@@ -238,7 +238,7 @@ PARAM_DEFINE_FLOAT(THR_MRAC_REF_MODEL_BM, 5.0f);
  * @increment 0.001
  * @group Thrust Acc Control
  */
-PARAM_DEFINE_FLOAT(THR_MRAC_GAMMA_KR, 0.1f);
+PARAM_DEFINE_FLOAT(THR_MRAC_G_KR, 0.1f);
 
 /**
  * MRAC Adaptation Gain for Kx (Feedback)
@@ -252,7 +252,7 @@ PARAM_DEFINE_FLOAT(THR_MRAC_GAMMA_KR, 0.1f);
  * @increment 0.001
  * @group Thrust Acc Control
  */
-PARAM_DEFINE_FLOAT(THR_MRAC_GAMMA_KX, 0.1f);
+PARAM_DEFINE_FLOAT(THR_MRAC_G_KX, 0.1f);
 
 /**
  * MRAC Low-Pass Filter Cutoff Frequency
@@ -267,7 +267,7 @@ PARAM_DEFINE_FLOAT(THR_MRAC_GAMMA_KX, 0.1f);
  * @unit Hz
  * @group Thrust Acc Control
  */
-PARAM_DEFINE_FLOAT(THR_MRAC_LPF_CUTOFF, 8.0f);
+PARAM_DEFINE_FLOAT(THR_MRAC_LPF_CUT, 8.0f);
 
 /**
  * MRAC Kr Maximum Value

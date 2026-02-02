@@ -190,15 +190,15 @@ class ThrustAccControl : public ModuleBase<ThrustAccControl>,
 
       // === MRAC Parameters ===
       // Reference model parameters
-      (ParamFloat<px4::params::THR_MRAC_REF_MODEL_AM>)_mrac_ref_model_am,
-      (ParamFloat<px4::params::THR_MRAC_REF_MODEL_BM>)_mrac_ref_model_bm,
+      (ParamFloat<px4::params::THR_MRAC_RM_AM>)_mrac_ref_model_am,
+      (ParamFloat<px4::params::THR_MRAC_RM_BM>)_mrac_ref_model_bm,
 
       // Adaptation gains (learning rates)
-      (ParamFloat<px4::params::THR_MRAC_GAMMA_KR>)_mrac_gamma_kr,
-      (ParamFloat<px4::params::THR_MRAC_GAMMA_KX>)_mrac_gamma_kx,
+      (ParamFloat<px4::params::THR_MRAC_G_KR>)_mrac_gamma_kr,
+      (ParamFloat<px4::params::THR_MRAC_G_KX>)_mrac_gamma_kx,
 
       // Low-pass filter cutoff frequency
-      (ParamFloat<px4::params::THR_MRAC_LPF_CUTOFF>)_mrac_lpf_cutoff,
+      (ParamFloat<px4::params::THR_MRAC_LPF_CUT>)_mrac_lpf_cutoff,
 
       // Projection operator limits (safety bounds)
       (ParamFloat<px4::params::THR_MRAC_KR_MAX>)_mrac_kr_max,
