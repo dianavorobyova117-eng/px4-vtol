@@ -199,47 +199,127 @@ PARAM_DEFINE_FLOAT(PITCH_TOR_K, 0.1f);
 PARAM_DEFINE_FLOAT(PITCH_TOR_BD, 0.03f);
 
 /**
- * Thrust gamma relative
+ * MRAC Reference Model Coefficient A (Pole)
  *
- * 这参数用于推力与加速度控制循环中的 gamma 修正系数。
+ * Defines the reference model dynamics: ẋₘ = -am·xₘ + bm·r
+ * Higher values = faster response. Typically am = bm for unit gain.
  *
- * @min 0.0
- * @max 2.0
+ * @min 1.0
+ * @max 20.0
+ * @decimal 2
+ * @increment 0.1
+ * @group Thrust Acc Control
+ */
+PARAM_DEFINE_FLOAT(THR_MRAC_REF_MODEL_AM, 5.0f);
+
+/**
+ * MRAC Reference Model Coefficient B (Gain)
+ *
+ * Defines the reference model input gain.
+ * Typically bm = am for unit DC gain.
+ *
+ * @min 1.0
+ * @max 20.0
+ * @decimal 2
+ * @increment 0.1
+ * @group Thrust Acc Control
+ */
+PARAM_DEFINE_FLOAT(THR_MRAC_REF_MODEL_BM, 5.0f);
+
+/**
+ * MRAC Adaptation Gain for Kr (Feedforward)
+ *
+ * Learning rate for the feedforward adaptive parameter Kr.
+ * Higher = faster adaptation but may cause oscillation.
+ *
+ * @min 0.001
+ * @max 5.0
+ * @decimal 4
+ * @increment 0.001
+ * @group Thrust Acc Control
+ */
+PARAM_DEFINE_FLOAT(THR_MRAC_GAMMA_KR, 0.1f);
+
+/**
+ * MRAC Adaptation Gain for Kx (Feedback)
+ *
+ * Learning rate for the feedback adaptive parameter Kx.
+ * Higher = faster adaptation but may cause oscillation.
+ *
+ * @min 0.001
+ * @max 5.0
+ * @decimal 4
+ * @increment 0.001
+ * @group Thrust Acc Control
+ */
+PARAM_DEFINE_FLOAT(THR_MRAC_GAMMA_KX, 0.1f);
+
+/**
+ * MRAC Low-Pass Filter Cutoff Frequency
+ *
+ * Cutoff frequency for filtering adaptive parameters.
+ * Reduces high-frequency oscillations in control output.
+ *
+ * @min 1.0
+ * @max 20.0
+ * @decimal 1
+ * @increment 0.5
+ * @unit Hz
+ * @group Thrust Acc Control
+ */
+PARAM_DEFINE_FLOAT(THR_MRAC_LPF_CUTOFF, 8.0f);
+
+/**
+ * MRAC Kr Maximum Value
+ *
+ * Upper bound for feedforward adaptive parameter.
+ * Prevents excessive feedforward action.
+ *
+ * @min 0.1
+ * @max 10.0
  * @decimal 3
  * @increment 0.01
  * @group Thrust Acc Control
  */
-PARAM_DEFINE_FLOAT(THR_GAMMA_R, 0.01f);
+PARAM_DEFINE_FLOAT(THR_MRAC_KR_MAX, 2.0f);
 
 /**
- * Thrust gamma X
+ * MRAC Kr Minimum Value
+ *
+ * Lower bound for feedforward adaptive parameter.
+ * Prevents negative feedforward (reverse thrust).
  *
  * @min 0.0
- * @max 2.0
+ * @max 0.5
+ * @decimal 4
+ * @increment 0.001
+ * @group Thrust Acc Control
+ */
+PARAM_DEFINE_FLOAT(THR_MRAC_KR_MIN, 0.01f);
+
+/**
+ * MRAC Kx Maximum Value
+ *
+ * Upper bound for feedback adaptive parameter.
+ *
+ * @min 0.1
+ * @max 5.0
  * @decimal 3
  * @increment 0.01
  * @group Thrust Acc Control
  */
-PARAM_DEFINE_FLOAT(THR_GAMMA_X, 0.0f);
+PARAM_DEFINE_FLOAT(THR_MRAC_KX_MAX, 1.0f);
 
 /**
- * Thrust model coefficient A (Slope)
+ * MRAC Kx Minimum Value
  *
- * @min 0.0
- * @max 100.0
+ * Lower bound for feedback adaptive parameter.
+ * Allows negative feedback for damping.
+ *
+ * @min -5.0
+ * @max -0.1
  * @decimal 3
- * @increment 0.001
+ * @increment 0.01
  * @group Thrust Acc Control
  */
-PARAM_DEFINE_FLOAT(THR_A_M, 2.0f);
-
-/**
- * Thrust model coefficient B (Offset)
- *
- * @min -100.0
- * @max 100.0
- * @decimal 3
- * @increment 0.001
- * @group Thrust Acc Control
- */
-PARAM_DEFINE_FLOAT(THR_B_M, 2.0f);
+PARAM_DEFINE_FLOAT(THR_MRAC_KX_MIN, -1.0f);

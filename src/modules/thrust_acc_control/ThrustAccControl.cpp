@@ -76,8 +76,6 @@ void ThrustAccControl::parameters_updated() {
   // rate control parameters
   // The controller gain K is used to convert the parallel (P + I/s + sD) form
   // to the ideal (K * [1 + 1/sTi + sTd]) form
-  // const Vector3f rate_k = Vector3f(_param_thr_p.get(), 0., 0.);
-  _thr_p = _param_thr_p.get();
   _delta_thr_bound = _param_delta_thr_bound.get();
   _timeout_acc = _param_thr_timeout_acc.get();
   _timeout_time = _param_sys_timeout_time.get() * 1e5;
@@ -171,31 +169,80 @@ void ThrustAccControl::Run() {
         dt = 1.0f / _param_imu_gyro_rate_max.get();
       }
 
-        // --- MRAC 开始 ---
+        // ============================================================
+        // MRAC (Model Reference Adaptive Control)
+        // ============================================================
 
-        // 1. 参考模型演进 (Euler integration)
-        // a_model_dot = -Am * a_model + Bm * r
-        float a_model_dot = -_am * _a_model + _bm * _thrust_acc_sp;
-        _a_model += a_model_dot * dt;
+        // Temporary variables
+        float error = 0.0f;
+        float update_rate_kr = 0.0f;
+        float update_rate_kx = 0.0f;
+        float p_gain = 1.0f;
 
-        // 2. 计算跟踪误差
-        float error = _a_curr - _a_model;
+        // --- 1. Reference Model Evolution ---
+        // Formula: x_m_dot = -am * x_m + bm * r
+        float ref_model_dot = -_mrac_ref_model_am.get() * _mrac_ref_state +
+                              _mrac_ref_model_bm.get() * _thrust_acc_sp;
+        _mrac_ref_state += ref_model_dot * dt;
 
-        // 3. 自适应律更新 (带简单的死区防止噪声积分)
-        if (fabsf(error) > 0.1f) {
-            _kr -= _gamma_r * _thrust_acc_sp * error * dt;
-            _kx -= _gamma_x * _a_curr * error * dt;
+        // --- 2. Tracking Error Calculation ---
+        // Formula: e = x - x_m (plant_state - reference_model_state)
+        error = _a_curr - _mrac_ref_state;
+
+        // --- 3. Adaptation Law ---
+        // With normalization to prevent divergence from large inputs
+        float norm_factor = 1.0f + _thrust_acc_sp * _thrust_acc_sp + _a_curr * _a_curr;
+        if (norm_factor < 1.0f) norm_factor = 1.0f;
+
+        // Raw update rates (before projection)
+        float raw_dot_kr = -_mrac_gamma_kr.get() * _thrust_acc_sp * error * p_gain / norm_factor;
+        float raw_dot_kx = -_mrac_gamma_kx.get() * _a_curr * error * p_gain / norm_factor;
+
+        // --- 4. Projection Operator ---
+        // Get parameter limits from params
+        const float KR_MAX = _mrac_kr_max.get();
+        const float KR_MIN = _mrac_kr_min.get();
+        const float KX_MAX = _mrac_kx_max.get();
+        const float KX_MIN = _mrac_kx_min.get();
+
+        // Kr projection logic
+        if (_mrac_hat_kr >= KR_MAX && raw_dot_kr > 0.0f) {
+            update_rate_kr = 0.0f;
+        } else if (_mrac_hat_kr <= KR_MIN && raw_dot_kr < 0.0f) {
+            update_rate_kr = 0.0f;
+        } else {
+            update_rate_kr = raw_dot_kr;
         }
 
-        // 4. 防止增益发散 (Projection Operator 简化版)
-        _kr = math::constrain(_kr, 0.01f, 2.0f);
-        _kx = math::constrain(_kx, -1.0f, 1.0f);
+        // Kx projection logic
+        if (_mrac_hat_kx >= KX_MAX && raw_dot_kx > 0.0f) {
+            update_rate_kx = 0.0f;
+        } else if (_mrac_hat_kx <= KX_MIN && raw_dot_kx < 0.0f) {
+            update_rate_kx = 0.0f;
+        } else {
+            update_rate_kx = raw_dot_kx;
+        }
 
-        // 5. 计算控制输出
-        // u = kr * r + kx * x
-        _u = _kr * _thrust_acc_sp + _kx * _a_curr;
+        // --- 5. Parameter Integration ---
+        _mrac_hat_kr += update_rate_kr * dt;
+        _mrac_hat_kx += update_rate_kx * dt;
 
-        // --- MRAC 结束 ---
+        // --- 6. Safety Clamp ---
+        _mrac_hat_kr = math::constrain(_mrac_hat_kr, KR_MIN, KR_MAX);
+        _mrac_hat_kx = math::constrain(_mrac_hat_kx, KX_MIN, KX_MAX);
+
+        // --- 7. Low-Pass Filter for Smooth Control ---
+        float cutoff_freq = _mrac_lpf_cutoff.get();
+        float rc = 1.0f / (2.0f * M_PI_F * cutoff_freq);
+        float alpha = dt / (rc + dt);
+
+        // Filter adaptive parameters for smooth control output
+        _mrac_hat_kr_filtered = _mrac_hat_kr_filtered + alpha * (_mrac_hat_kr - _mrac_hat_kr_filtered);
+        _mrac_hat_kx_filtered = _mrac_hat_kx_filtered + alpha * (_mrac_hat_kx - _mrac_hat_kx_filtered);
+
+        // --- 8. Control Output Calculation ---
+        // u = Kr_filtered * r + Kx_filtered * x
+        _u = _mrac_hat_kr_filtered * _thrust_acc_sp + _mrac_hat_kx_filtered * _a_curr;
 
 
       

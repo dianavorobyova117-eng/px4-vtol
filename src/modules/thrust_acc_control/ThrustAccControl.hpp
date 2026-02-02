@@ -137,7 +137,6 @@ class ThrustAccControl : public ModuleBase<ThrustAccControl>,
   float _a_curr;
   float _thrust_acc_sp{};
   matrix::Quaternionf _rotate_q{};
-  float _thr_p;
   float _beta;
   float _thr_model_ff;
   // we assumes the model of thrust is quadratic, i.e. a_t = a*u
@@ -157,22 +156,27 @@ class ThrustAccControl : public ModuleBase<ThrustAccControl>,
   float _pitch_torque_k;
   float _pitch_torque_bd;
 
-  // MARC part;
-  float _a_model{0.0f};
-  float _kr{0.5f};
-  float _kx{0.0f};
+  // ============================================================
+  // MRAC (Model Reference Adaptive Control) State Variables
+  // ============================================================
 
-  float _gamma_r{0.01f};
-  float _gamma_x{0.0f};
-  float _am{2.0f};
-  float _bm{2.0f};
+  // Reference model state (ideal acceleration trajectory)
+  float _mrac_ref_state{0.0f};
 
+  // Adaptive parameter estimates (hat denotes estimate)
+  float _mrac_hat_kr{0.1f};  // Feedforward gain estimate
+  float _mrac_hat_kx{0.0f};  // Feedback gain estimate
+
+  // Filtered adaptive parameters (for smooth control output)
+  float _mrac_hat_kr_filtered{0.1f};
+  float _mrac_hat_kx_filtered{0.0f};
 
   AlphaFilter<float> _rate_sft_filter;
   AlphaFilter<float> _acc_sft_filter;
   AttitudeControl _attitude_control;
   vehicle_rates_setpoint_s _vehicle_rates_setpoint{};
   DEFINE_PARAMETERS(
+      // === Existing parameters ===
       (ParamFloat<px4::params::MC_ROLL_P>)_param_mc_roll_p,
       (ParamFloat<px4::params::MC_PITCH_P>)_param_mc_pitch_p,
       (ParamFloat<px4::params::MC_YAW_P>)_param_mc_yaw_p,
@@ -183,13 +187,26 @@ class ThrustAccControl : public ModuleBase<ThrustAccControl>,
 
       (ParamFloat<px4::params::PITCH_TOR_K>)_param_pitch_torque_k,
       (ParamFloat<px4::params::PITCH_TOR_BD>)_param_pitch_torque_bd,
-      //MARC params
-      (ParamFloat<px4::params::THR_GAMMA_R>)_param_thr_gamma_r,
-      (ParamFloat<px4::params::THR_GAMMA_X>)_param_thr_gamma_x,
-      (ParamFloat<px4::params::THR_A_M>)_param_thr_a_m,
-      (ParamFloat<px4::params::THR_B_M>)_param_thr_b_m,
-      //
-      (ParamFloat<px4::params::THR_P>)_param_thr_p,
+
+      // === MRAC Parameters ===
+      // Reference model parameters
+      (ParamFloat<px4::params::THR_MRAC_REF_MODEL_AM>)_mrac_ref_model_am,
+      (ParamFloat<px4::params::THR_MRAC_REF_MODEL_BM>)_mrac_ref_model_bm,
+
+      // Adaptation gains (learning rates)
+      (ParamFloat<px4::params::THR_MRAC_GAMMA_KR>)_mrac_gamma_kr,
+      (ParamFloat<px4::params::THR_MRAC_GAMMA_KX>)_mrac_gamma_kx,
+
+      // Low-pass filter cutoff frequency
+      (ParamFloat<px4::params::THR_MRAC_LPF_CUTOFF>)_mrac_lpf_cutoff,
+
+      // Projection operator limits (safety bounds)
+      (ParamFloat<px4::params::THR_MRAC_KR_MAX>)_mrac_kr_max,
+      (ParamFloat<px4::params::THR_MRAC_KR_MIN>)_mrac_kr_min,
+      (ParamFloat<px4::params::THR_MRAC_KX_MAX>)_mrac_kx_max,
+      (ParamFloat<px4::params::THR_MRAC_KX_MIN>)_mrac_kx_min,
+
+      // === Existing thrust control parameters ===
       (ParamFloat<px4::params::THR_TMO_ACC>)_param_thr_timeout_acc,
       (ParamFloat<px4::params::GYROX_CUTOFF>)_param_imu_gyro_cutoff,
       (ParamInt<px4::params::IMU_GYRO_RATEMAX>)_param_imu_gyro_rate_max,
