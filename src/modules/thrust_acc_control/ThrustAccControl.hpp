@@ -171,6 +171,9 @@ class ThrustAccControl : public ModuleBase<ThrustAccControl>,
   float _mrac_hat_kr_filtered{0.1f};
   float _mrac_hat_kx_filtered{0.0f};
 
+  // Filtered acceleration measurement (for smooth control)
+  float _a_curr_filtered{0.0f};
+
   AlphaFilter<float> _rate_sft_filter;
   AlphaFilter<float> _acc_sft_filter;
   AttitudeControl _attitude_control;
@@ -205,6 +208,9 @@ class ThrustAccControl : public ModuleBase<ThrustAccControl>,
       (ParamFloat<px4::params::THR_MRAC_KR_MIN>)_mrac_kr_min,
       (ParamFloat<px4::params::THR_MRAC_KX_MAX>)_mrac_kx_max,
       (ParamFloat<px4::params::THR_MRAC_KX_MIN>)_mrac_kx_min,
+
+      // Normalization factor
+      (ParamFloat<px4::params::THR_MRAC_NORM>)_mrac_norm,
 
       // === Existing thrust control parameters ===
       (ParamFloat<px4::params::THR_TMO_ACC>)_param_thr_timeout_acc,

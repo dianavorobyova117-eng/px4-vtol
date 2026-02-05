@@ -191,7 +191,7 @@ void ThrustAccControl::Run() {
 
         // --- 3. Adaptation Law ---
         // With normalization to prevent divergence from large inputs
-        float norm_factor = 1.0f + _thrust_acc_sp * _thrust_acc_sp + _a_curr * _a_curr;
+        float norm_factor = 1.0f + _mrac_norm.get() * _thrust_acc_sp * _thrust_acc_sp + _mrac_norm.get() * _a_curr * _a_curr;
         if (norm_factor < 1.0f) norm_factor = 1.0f;
 
         // Raw update rates (before projection)
@@ -240,9 +240,12 @@ void ThrustAccControl::Run() {
         _mrac_hat_kr_filtered = _mrac_hat_kr_filtered + alpha * (_mrac_hat_kr - _mrac_hat_kr_filtered);
         _mrac_hat_kx_filtered = _mrac_hat_kx_filtered + alpha * (_mrac_hat_kx - _mrac_hat_kx_filtered);
 
+        // Filter acceleration measurement for smooth control
+        _a_curr_filtered = _a_curr_filtered + alpha * (_a_curr - _a_curr_filtered);
+
         // --- 8. Control Output Calculation ---
         // u = Kr_filtered * r + Kx_filtered * x
-        _u = _mrac_hat_kr_filtered * _thrust_acc_sp + _mrac_hat_kx_filtered * _a_curr;
+        _u = _mrac_hat_kr_filtered * _thrust_acc_sp + _mrac_hat_kx_filtered * _a_curr_filtered;
 
         // --- 9. Publish MRAC Control Status in vehicle_rates_setpoint ---
       _u = math::constrain<float>(_u, 0.0, 1.0);
@@ -255,8 +258,13 @@ void ThrustAccControl::Run() {
       // MRAC control status
       _vehicle_rates_setpoint.mrac_ref_acc = _thrust_acc_sp;
       _vehicle_rates_setpoint.mrac_actual_acc = _a_curr;
+      _vehicle_rates_setpoint.mrac_actual_acc_filtered = _a_curr_filtered;
       _vehicle_rates_setpoint.mrac_ref_model_state = _mrac_ref_state;
       _vehicle_rates_setpoint.mrac_tracking_error = error;
+      _vehicle_rates_setpoint.mrac_hat_kr = _mrac_hat_kr;
+      _vehicle_rates_setpoint.mrac_hat_kx = _mrac_hat_kx;
+      _vehicle_rates_setpoint.mrac_hat_kr_filtered = _mrac_hat_kr_filtered;
+      _vehicle_rates_setpoint.mrac_hat_kx_filtered = _mrac_hat_kx_filtered;
 
       _vehicle_rates_setpoint_pub.publish(_vehicle_rates_setpoint);
     } else {

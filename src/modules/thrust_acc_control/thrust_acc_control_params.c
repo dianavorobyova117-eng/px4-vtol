@@ -204,13 +204,13 @@ PARAM_DEFINE_FLOAT(PITCH_TOR_BD, 0.03f);
  * Defines the reference model dynamics: ẋₘ = -am·xₘ + bm·r
  * Higher values = faster response. Typically am = bm for unit gain.
  *
- * @min 1.0
+ * @min 0.01
  * @max 20.0
  * @decimal 2
  * @increment 0.1
  * @group Thrust Acc Control
  */
-PARAM_DEFINE_FLOAT(THR_MRAC_RM_AM, 5.0f);
+PARAM_DEFINE_FLOAT(THR_MRAC_RM_AM, 3.0f);
 
 /**
  * MRAC Reference Model Coefficient B (Gain)
@@ -218,13 +218,13 @@ PARAM_DEFINE_FLOAT(THR_MRAC_RM_AM, 5.0f);
  * Defines the reference model input gain.
  * Typically bm = am for unit DC gain.
  *
- * @min 1.0
+ * @min 0.01
  * @max 20.0
  * @decimal 2
  * @increment 0.1
  * @group Thrust Acc Control
  */
-PARAM_DEFINE_FLOAT(THR_MRAC_RM_BM, 5.0f);
+PARAM_DEFINE_FLOAT(THR_MRAC_RM_BM, 3.0f);
 
 /**
  * MRAC Adaptation Gain for Kr (Feedforward)
@@ -232,7 +232,7 @@ PARAM_DEFINE_FLOAT(THR_MRAC_RM_BM, 5.0f);
  * Learning rate for the feedforward adaptive parameter Kr.
  * Higher = faster adaptation but may cause oscillation.
  *
- * @min 0.001
+ * @min 0.00001
  * @max 5.0
  * @decimal 4
  * @increment 0.001
@@ -246,7 +246,7 @@ PARAM_DEFINE_FLOAT(THR_MRAC_G_KR, 0.1f);
  * Learning rate for the feedback adaptive parameter Kx.
  * Higher = faster adaptation but may cause oscillation.
  *
- * @min 0.001
+ * @min 0.0
  * @max 5.0
  * @decimal 4
  * @increment 0.001
@@ -267,7 +267,7 @@ PARAM_DEFINE_FLOAT(THR_MRAC_G_KX, 0.1f);
  * @unit Hz
  * @group Thrust Acc Control
  */
-PARAM_DEFINE_FLOAT(THR_MRAC_LPF_CUT, 15.0f);
+PARAM_DEFINE_FLOAT(THR_MRAC_LPF_CUT, 30.0f);
 
 /**
  * MRAC Kr Maximum Value
@@ -292,10 +292,10 @@ PARAM_DEFINE_FLOAT(THR_MRAC_KR_MAX, 2.0f);
  * @min 0.0
  * @max 0.5
  * @decimal 4
- * @increment 0.001
+ * @increment 0.00001
  * @group Thrust Acc Control
  */
-PARAM_DEFINE_FLOAT(THR_MRAC_KR_MIN, 0.01f);
+PARAM_DEFINE_FLOAT(THR_MRAC_KR_MIN, 0.0001f);
 
 /**
  * MRAC Kx Maximum Value
@@ -322,4 +322,18 @@ PARAM_DEFINE_FLOAT(THR_MRAC_KX_MAX, 1.0f);
  * @increment 0.01
  * @group Thrust Acc Control
  */
-PARAM_DEFINE_FLOAT(THR_MRAC_KX_MIN, -1.0f);
+PARAM_DEFINE_FLOAT(THR_MRAC_KX_MIN, -2.0f);
+
+/**
+ * MRAC Normalization Factor
+ *
+ * Normalization factor for adaptation law to prevent parameter divergence
+ * with large input signals. Formula: 1 + norm * (r² + x²)
+ *
+ * @min 0.001
+ * @max 1.0
+ * @decimal 4
+ * @increment 0.001
+ * @group Thrust Acc Control
+ */
+PARAM_DEFINE_FLOAT(THR_MRAC_NORM, 0.05f);
