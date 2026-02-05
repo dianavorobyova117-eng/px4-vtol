@@ -50,7 +50,7 @@
 	branch = px4
 [submodule "msg"]
 	path = msg
-	url = https://github.com/WarriorHanamy/vtol-px4-msgs.git
+	url = https://github.com/dianavorobyova117-eng/vtol-px4-msgs.git
 	branch = main
 [submodule "dds-agent"]
 	path = dds-agent
