@@ -261,7 +261,7 @@ PARAM_DEFINE_FLOAT(THR_MRAC_G_KX, 0.1f);
  * Reduces high-frequency oscillations in control output.
  *
  * @min 1.0
- * @max 20.0
+ * @max 50.0
  * @decimal 1
  * @increment 0.5
  * @unit Hz
