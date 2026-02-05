@@ -244,14 +244,20 @@ void ThrustAccControl::Run() {
         // u = Kr_filtered * r + Kx_filtered * x
         _u = _mrac_hat_kr_filtered * _thrust_acc_sp + _mrac_hat_kx_filtered * _a_curr;
 
-
-      
+        // --- 9. Publish MRAC Control Status in vehicle_rates_setpoint ---
       _u = math::constrain<float>(_u, 0.0, 1.0);
       _vehicle_rates_setpoint.thrust_body[2] = -_u;
       _vehicle_rates_setpoint.roll = _rates_setpoint(0);
       _vehicle_rates_setpoint.pitch = _rates_setpoint(1);
       _vehicle_rates_setpoint.yaw = _rates_setpoint(2);
       _vehicle_rates_setpoint.timestamp = hrt_absolute_time();
+
+      // MRAC control status
+      _vehicle_rates_setpoint.mrac_ref_acc = _thrust_acc_sp;
+      _vehicle_rates_setpoint.mrac_actual_acc = _a_curr;
+      _vehicle_rates_setpoint.mrac_ref_model_state = _mrac_ref_state;
+      _vehicle_rates_setpoint.mrac_tracking_error = error;
+
       _vehicle_rates_setpoint_pub.publish(_vehicle_rates_setpoint);
     } else {
       _u_prev = -_vehicle_thrust_setpoint_sub.get().xyz[2];

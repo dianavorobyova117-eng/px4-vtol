@@ -267,7 +267,7 @@ PARAM_DEFINE_FLOAT(THR_MRAC_G_KX, 0.1f);
  * @unit Hz
  * @group Thrust Acc Control
  */
-PARAM_DEFINE_FLOAT(THR_MRAC_LPF_CUT, 8.0f);
+PARAM_DEFINE_FLOAT(THR_MRAC_LPF_CUT, 15.0f);
 
 /**
  * MRAC Kr Maximum Value
